@@ -31,7 +31,7 @@ O sistema utiliza um modelo relacional com as seguintes entidades principais:
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **Backend:** Java (Spring Boot)
+- **Backend:** TypeScript
 - **Banco de Dados:** PostgreSQL
 - **Frontend:** React.js
 - **Cloud:** AWS (S3, Lambda, API Gateway, RDS)
@@ -51,3 +51,4 @@ As tabelas principais:
 1. Clone o repositório:
    ```bash
    git clone https://github.com/seu-usuario/educabrasil.git
+
