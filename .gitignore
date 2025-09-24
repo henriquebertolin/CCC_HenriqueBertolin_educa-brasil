@@ -1,0 +1,61 @@
+# ========================
+# Node.js / TypeScript API
+# ========================
+
+# Dependências
+backend/node_modules/
+
+# Build (arquivos compilados pelo TypeScript)
+backend/dist/
+backend/build/
+
+# Variáveis de ambiente
+backend/.env
+backend/.env.local
+backend/.env.development
+backend/.env.production
+backend/.env.test
+
+# Logs
+backend/logs/
+backend/*.log
+backend/npm-debug.log*
+backend/yarn-debug.log*
+backend/yarn-error.log*
+backend/pnpm-debug.log*
+
+# Cache e temporários
+backend/.tmp/
+backend/.cache/
+
+# IDEs e configs locais
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testes
+backend/coverage/
+backend/.jest/
+
+# AWS / Amplify / Serverless
+backend/.aws/
+backend/.amplify/
+
+# Docker
+backend/docker-compose.override.yml
+backend/*.pid
+backend/*.seed
+backend/*.pid.lock
+
+# Certificados e chaves privadas
+backend/*.pem
+backend/*.key
+backend/*.crt
+
+# Arquivos gerados automaticamente
+backend/swagger.json
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
