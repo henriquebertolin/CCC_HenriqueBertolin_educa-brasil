@@ -19,7 +19,7 @@ export async function authMiddleware(
         const token = request.headers.authorization?.replace('Bearer ', '');
 
         if(!token){
-            return reply.status(401).send({error: 'Token not provided'})
+            return reply.status(401).send({error: 'Token not provideds'})
 
         }
         
