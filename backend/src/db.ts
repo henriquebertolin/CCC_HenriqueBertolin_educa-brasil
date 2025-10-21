@@ -3,9 +3,9 @@ import dotenv from 'dotenv';
 import fs  from 'fs'
 import path from 'path';
 dotenv.config();
-const caBundle = fs.readFileSync(
-  path.resolve(__dirname, 'certs/global-bundle.pem')
-).toString();
+// const caBundle = fs.readFileSync(
+//   path.resolve(__dirname, 'certs/global-bundle.pem')
+// ).toString();
  
 export class Database {
     private pool: Pool;
@@ -13,10 +13,10 @@ export class Database {
     constructor(){
         this.pool = new Pool({
             connectionString: process.env.CON_STRING,
-            ssl: {
-                rejectUnauthorized: true,
-                ca: caBundle
-            }
+            // ssl: {
+            //     rejectUnauthorized: true,
+            //     ca: caBundle
+            // }
           //  ssl: { rejectUnauthorized: false }
           //  user: process.env.DB_USER,
           //  password: process.env.DB_PASSWORD

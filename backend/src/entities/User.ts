@@ -23,15 +23,15 @@ export interface CreateStoreReponse {
 }
 
 export interface LoginRequest {
-    cnpj: string,
+    username: string,
     password: string,
 }
 
 export interface LoginResponse {
     token: string
-    store: {
+    user: {
         id: string,
-        cnpj: string,
+        username: string,
         name: string,
         city: string,
         creation_date: Date,
