@@ -14,7 +14,7 @@ export class  LoginController {
         try{
             const loginSchema = z.object({
                 username: z.string().min(1, "username is required"),
-                password: z.string().min(1, "Password is required")
+                senha: z.string().min(1, "Password is required")
             })
 
             const validationResult = loginSchema.safeParse(request.body)

@@ -8,18 +8,18 @@ const JWT_SECRET = process.env.JWT_SECRET || 'henrigor';
 export class LoginUseCase {
 
     async login(userData: LoginRequest): Promise<LoginResponse>{
-        const {username, password} = userData;
+        const {username, senha} = userData;
 
-        const result = await db.query(`SELECT * from users where username = $1`, [username]);
+        const result = await db.query(`SELECT * from usuarios where username = $1`, [username]);
         if(result.rows.length === 0){
             throw new Error('Invalid credentials');
         }
 
         const user = result.rows[0];
 
-        const isValidPassword = await bcrypt.compare(password, user.password);
+        const isValidSenha = await bcrypt.compare(senha, user.senha);
 
-        if(!isValidPassword){
+        if(!isValidSenha){
             
             throw new Error('Invalid credentials');
         }
@@ -34,8 +34,8 @@ export class LoginUseCase {
                 id: user.id,
                 username: user.username, 
                 name: user.name,
-                city: user.city,
-                creation_date: user.creation_date, 
+                cidade: user.cidade,
+                criacao: user.creation_date, 
             }
         }
     }

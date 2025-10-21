@@ -1,30 +1,32 @@
-export interface Store {
+export interface Usuario {
     id: string,
-    cnpj: string,
-    password: string,
+    username: string,
+    email: string,
+    senha: string,
     name: string,
-    city: string,
-    posted_amount: Number,
-    paid_amount: Number,
-    creation_date: Date,
-    update_date: Date,
-    active: boolean,
+    cidade: string,
+    criacao: Date,
+    atualizacao: Date,
+    ativo: boolean,
+    professor: boolean,
 }
 
-export interface CreateStoreRequest {
+export interface CreateUsuarioRequest {
     name: string,
-    cnpj: string,
-    password: string,
-    city: string,
+    username: string,
+    email: string,
+    senha: string,
+    professor: boolean,
+    cidade: string,
 }
 
-export interface CreateStoreReponse {
+export interface CreateUsuarioReponse {
     id: string
 }
 
 export interface LoginRequest {
     username: string,
-    password: string,
+    senha: string,
 }
 
 export interface LoginResponse {
@@ -33,8 +35,8 @@ export interface LoginResponse {
         id: string,
         username: string,
         name: string,
-        city: string,
-        creation_date: Date,
+        cidade: string,
+        criacao: Date,
     }
 
 }
