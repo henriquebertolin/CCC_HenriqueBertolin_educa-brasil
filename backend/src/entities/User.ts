@@ -41,3 +41,20 @@ export interface LoginResponse {
 
 }
 
+export interface GetUserByIdRequest {
+    id: string
+}
+
+export interface FindByIdResponse {
+    id : string,
+    username: string,
+    email: string,
+    senha: string,
+    name: string,
+    cidade: string,
+    criacao: Date,
+    atualizacao: Date,
+    ativo: boolean,
+    professor: boolean,
+}
+

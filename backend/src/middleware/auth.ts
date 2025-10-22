@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'aws-ccc-labengsoft';
+const JWT_SECRET = process.env.JWT_SECRET || 'awscclabengsoft';
 
 
 export interface AuthenticatedRequest  extends FastifyRequest {

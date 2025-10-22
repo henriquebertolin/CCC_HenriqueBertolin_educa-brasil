@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { UserUseCase } from "../usecase/UserUseCase";
 import z from "zod";
 import jwt from 'jsonwebtoken'
-import { CreateUsuarioRequest } from "../entities/User";
+import { CreateUsuarioRequest, GetUserByIdRequest } from "../entities/User";
 
 export class UserController {
     private userUseCase: UserUseCase;
@@ -52,5 +52,26 @@ export class UserController {
             })
         }
 
+    }
+
+    async getUserById(request: FastifyRequest, reply: FastifyReply) {
+        try {
+            const id = request.params as GetUserByIdRequest;
+            if (!id) {
+                return reply.status(404).send({
+                    error : 'Cannot be null'
+                });
+            }
+            const user = await this.userUseCase.findById(id);
+
+            return reply.status(200).send({
+                message : 'User found',
+                user
+            })
+        } catch (error: any) {
+            return reply.status(400).send({
+                error: error.message || 'Failed to find user',
+            });
+        }
     }
 }

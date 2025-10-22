@@ -1,5 +1,5 @@
 import { db } from "../db";
-import { CreateUsuarioReponse, CreateUsuarioRequest, LoginRequest, LoginResponse } from "../entities/User";
+import { CreateUsuarioReponse, CreateUsuarioRequest, FindByIdResponse, GetUserByIdRequest, LoginRequest, LoginResponse } from "../entities/User";
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
@@ -22,5 +22,15 @@ export class UserUseCase {
         );
         return create.rows[0];
     }
+
+    async findById (userData : GetUserByIdRequest) : Promise<FindByIdResponse> {
+      const result = await db.query(`select * from usuarios where id = $1`, [userData.id]);
+      if ( result.rows.length < 1) {
+        throw new Error('There is no user with this ID');
+      }
+      return result.rows[0];
+    }
+
+    
 
 }

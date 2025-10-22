@@ -3,7 +3,7 @@ import { LoginRequest, LoginResponse } from "../entities/User";
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'henrigor';
+const JWT_SECRET = process.env.JWT_SECRET || 'awscclabengsoft';
 
 export class LoginUseCase {
 
