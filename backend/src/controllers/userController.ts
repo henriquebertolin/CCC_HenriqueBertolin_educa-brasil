@@ -54,6 +54,17 @@ export class UserController {
 
     }
 
+    async updateUser(request : FastifyRequest, reply: FastifyReply) {
+        const token = request.headers.authorization?.replace('Bearer ', '') as any;
+        const decoded = jwt.decode(token) as any;
+        console.log("id: " + decoded.id);
+        try {
+
+        } catch (error : any) {
+            
+        }
+    }
+
     async getUserById(request: FastifyRequest, reply: FastifyReply) {
         try {
             const id = request.params as GetUserByIdRequest;

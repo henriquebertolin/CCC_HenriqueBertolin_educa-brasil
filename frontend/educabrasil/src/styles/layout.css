@@ -1,0 +1,27 @@
+/* OCUPE A TELA TODA, SEM DEPENDER DO PAI */
+.auth-wrapper {
+  position: fixed;   /* <— ignora limites do contêiner pai */
+  inset: 0;          /* top/right/bottom/left = 0 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #ffffff 0%, #858585 100%); /* seu azul */
+  padding: 0;
+}
+
+/* Card grande e centralizado */
+.card {
+  width: min(90vw, 900px);
+  height: min(85vh, 720px);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(32px, 5vw, 64px);
+}
+
+.card h1 { margin: 0 0 16px; font-size: clamp(26px, 3.2vw, 34px); }
+.card p.muted { margin: 0 0 28px; font-size: clamp(14px, 1.6vw, 16px); }

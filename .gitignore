@@ -59,3 +59,51 @@ backend/swagger.json
 # Sistema operacional
 .DS_Store
 Thumbs.db
+
+# ========================
+# React + Vite Frontend
+# ========================
+
+# Dependências
+frontend/node_modules/
+
+# Build e cache
+frontend/dist/
+frontend/.vite/
+frontend/.cache/
+frontend/out/
+frontend/build/
+
+# Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# Variáveis de ambiente
+frontend/.env
+frontend/.env.local
+frontend/.env.development
+frontend/.env.production
+frontend/.env.test
+!frontend/.env.example   # mantém arquivo de exemplo
+
+# IDE / configs locais
+frontend/.vscode/
+frontend/.idea/
+
+# Sistema operacional
+frontend/.DS_Store
+frontend/Thumbs.db
+
+# Testes e coverage
+frontend/coverage/
+frontend/.jest/
+
+# Arquivos temporários ou locais
+frontend/*.pid
+frontend/*.seed
+frontend/*.pid.lock
+frontend/tmp/
+frontend/temp/
+frontend/.tmp/

@@ -1,0 +1,12 @@
+:root {
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --text: #111111;
+  --muted: #6b7280;
+  --primary: #111827;       /* preto grafite */
+  --primary-contrast: #ffffff;
+  --border: #e5e7eb;
+  --radius: 12px;
+  --shadow: 0 8px 24px rgba(0,0,0,0.08);
+  --space: 16px;
+}

@@ -1,0 +1,6 @@
+/* Reset/normalize básico */
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root { height: 100%; width: 100%; }  /* <— importante */
+body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: #111; background: #f6f7f9; }
+img, video { max-width: 100%; height: auto; }
+button, input, textarea, select { font: inherit; }
