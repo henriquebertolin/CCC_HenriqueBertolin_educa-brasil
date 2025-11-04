@@ -1,3 +1,4 @@
+
 CREATE TABLE usuarios (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username TEXT UNIQUE NOT NULL,
@@ -9,6 +10,15 @@ CREATE TABLE usuarios (
     ativo BOOLEAN NOT NULL DEFAULT TRUE,
     criacao TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     atualizacao TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+create table curso (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  description text,
+  teacher_id uuid not null references usuarios(id),
+  is_published boolean not null default false,
+  created_at timestamptz not null default now()
 );
 
 CREATE OR REPLACE FUNCTION atualizar_data_modificacao()

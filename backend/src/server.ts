@@ -3,6 +3,7 @@ import cors from '@fastify/cors'
 import { loginRoute } from './routes/loginRoutes'
 import dotenv from 'dotenv'
 import { userRoutes } from './routes/userRoutes'
+import { cursosRoutes } from './routes/cursosRoutes'
 
 dotenv.config()
 
@@ -15,6 +16,7 @@ const fastify = Fastify({
 fastify.register(cors);
 fastify.register(loginRoute);
 fastify.register(userRoutes);
+fastify.register(cursosRoutes);
 
 // validar conexão com o banco
 

@@ -48,7 +48,7 @@ export class UserController {
 
         } catch (error: any) {
             return reply.status(400).send({
-                error: error.message || 'Falied to create user'
+                error: error.message || 'Failed to create user'
             })
         }
 
