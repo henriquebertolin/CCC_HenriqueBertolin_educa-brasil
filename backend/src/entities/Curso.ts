@@ -2,7 +2,9 @@ export interface Curso {
     id : string,
     title : string,
     description : string,
-    teacherId : string,
+    teacher_id : string,
+    teacher_nome : string,
+    teacher_email : string,
     isPublished : boolean,
     createdAt : Date
 }
