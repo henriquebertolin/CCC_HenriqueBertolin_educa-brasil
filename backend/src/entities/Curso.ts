@@ -19,3 +19,7 @@ export interface CreateCursoRequest {
 export interface CreateCursoResponse {
     id: string
 }
+
+export interface GetCursoData {
+    id: string
+}

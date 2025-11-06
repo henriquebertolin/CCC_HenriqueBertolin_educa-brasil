@@ -1,4 +1,3 @@
-
 CREATE TABLE usuarios (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username TEXT UNIQUE NOT NULL,
@@ -19,6 +18,22 @@ create table curso (
   teacher_id uuid not null references usuarios(id),
   is_published boolean not null default false,
   created_at timestamptz not null default now()
+);
+
+create table matriculas (
+	id uuid primary key default gen_random_uuid(),
+	aluno_id uuid not null references usuarios(id),
+	curso_id uuid not null references curso(id)
+);
+
+create table aulas (
+  id uuid primary key default gen_random_uuid(),
+  curso_id uuid not null references curso(id),
+  titulo text not null,
+  video_url text not null,
+  duration_sec int not null default 0,
+  posicao int not null,
+  unique(curso_id, posicao)
 );
 
 CREATE OR REPLACE FUNCTION atualizar_data_modificacao()
