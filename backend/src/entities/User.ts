@@ -45,6 +45,10 @@ export interface GetUserByIdRequest {
     id: string
 }
 
+export interface GetUserByUsernameRequest {
+    username: string
+}
+
 export interface FindByIdResponse {
     id : string,
     username: string,

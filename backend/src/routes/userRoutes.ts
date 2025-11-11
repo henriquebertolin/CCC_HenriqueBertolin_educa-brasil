@@ -13,6 +13,10 @@ export async function userRoutes(fastify: FastifyInstance) {
             "/user/:id",
             userController.getUserById.bind(userController)
         );
+        fastify.get(
+            "/user/loggedUser",
+            userController.getLoggedUser.bind(userController)
+        );
 
     });
 }

@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { UserUseCase } from "../usecase/UserUseCase";
 import z from "zod";
 import jwt from 'jsonwebtoken'
-import { CreateUsuarioRequest, GetUserByIdRequest } from "../entities/User";
+import { CreateUsuarioRequest, GetUserByIdRequest, GetUserByUsernameRequest } from "../entities/User";
 
 export class UserController {
     private userUseCase: UserUseCase;
@@ -62,6 +62,24 @@ export class UserController {
 
         } catch (error : any) {
             
+        }
+    }
+
+    async getLoggedUser(request: FastifyRequest, reply: FastifyReply) {
+        try {
+            const token = request.headers.authorization?.replace('Bearer ', '') as any;
+            const decoded = jwt.decode(token) as any;
+            console.log("DECODED: " + decoded.username);
+            const user = await this.userUseCase.findByUsername(({ username: decoded.username }));
+
+            return reply.status(200).send({
+                message : 'User found',
+                user
+            })
+        } catch (error: any) {
+            return reply.status(400).send({
+                error: error.message || 'Failed to find user',
+            });
         }
     }
 

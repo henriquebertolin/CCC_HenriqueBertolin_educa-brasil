@@ -26,7 +26,7 @@ export class LoginUseCase {
         const token = jwt.sign({
             id: user.id, username: user.username
         }, JWT_SECRET, {
-            expiresIn: '11124h'
+            expiresIn: '1m'
         })
         return {
             token,
