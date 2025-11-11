@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { api } from "../../services/api";
+import { api, setAuthToken } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
 
 type LoggedUserResponse = {
@@ -55,16 +55,13 @@ export default function Login() {
       const token: string | undefined = data?.token;
       if (!token) throw new Error("Token não retornado pelo servidor.");
 
-      localStorage.setItem("token", token);
-      // valida token e obtém usuário
-      const { data: logged } = await api.get("/user/loggedUser", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!logged?.user) throw new Error("Token inválido.");
+      setAuthToken(token); // <- garante header para próximas requisições
+
+      // valida token pegando o usuário
+      const { data: logged } = await api.get("/user/loggedUser");
+      if (!logged?.user?.id) throw new Error("Token inválido ou expirado.");
 
       localStorage.setItem("user", JSON.stringify(logged.user));
-      setUser(logged.user);
-
       navigate("/home");
     } catch (err: any) {
       localStorage.removeItem("token");

@@ -8,6 +8,7 @@ import "./styles/reset.css";
 import "./styles/variables.css";
 import "./styles/layout.css";
 import "./styles/form.css";
+import "./styles/course.css";
 import { AuthProvider } from "./contexts/AuthContext";
 
 

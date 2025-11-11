@@ -9,9 +9,10 @@ import { GetCursoData } from "../entities/Curso";
 
 export class MatriculaController {
     private matriculaUseCase: MatriculaUseCase;
-
+    private userUseCase : UserUseCase;
     constructor() {
         this.matriculaUseCase = new MatriculaUseCase();
+        this.userUseCase = new UserUseCase();
     }
 
     async create(request: FastifyRequest, reply: FastifyReply) {
@@ -54,61 +55,50 @@ export class MatriculaController {
 
     async getCursosByAluno(request: FastifyRequest, reply: FastifyReply) {
         try {
-            const getAlunoParamsSchema = z.object({
-                id: z.string().min(1, "id is required"),
-            });
-            const paramsValidation = getAlunoParamsSchema.safeParse(
-                request.params
-            );
-
-            if (!paramsValidation.success) {
-                return reply.status(400).send({
-                    error: "Invalid params data",
-                    details: paramsValidation.error,
-                });
-            }
-            const alunoData = paramsValidation.data as GetAlunoData;
-
-            const aluno = await this.matriculaUseCase.findCursosByAluno(alunoData);
+            const token = request.headers.authorization?.replace('Bearer ', '') as any;
+            const decoded = jwt.decode(token) as any;
+            console.log("DECODED: " + decoded.username);
+            const user = await this.userUseCase.findByUsername(({ username: decoded.username }));
+            const aluno = await this.matriculaUseCase.findCursosByAluno(({id : user.id}));
 
             return reply.status(200).send({
-                message: "aluno found",
-                aluno: aluno,
-            });
-        } catch (error: any) {
-            return reply.status(400).send({
-                error: error.message || "Failed to find aluno",
-            });
-        }
+                message: 'User found',
+                aluno
+            })
+    } catch(error: any) {
+        return reply.status(400).send({
+            error: error.message || "Failed to find aluno",
+        });
     }
+}
 
     async getAlunosByCurso(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const getCursoParamsSchema = z.object({
-                id: z.string().min(1, "id is required"),
-            });
-            const paramsValidation = getCursoParamsSchema.safeParse(
-                request.params
-            );
+    try {
+        const getCursoParamsSchema = z.object({
+            id: z.string().min(1, "id is required"),
+        });
+        const paramsValidation = getCursoParamsSchema.safeParse(
+            request.params
+        );
 
-            if (!paramsValidation.success) {
-                return reply.status(400).send({
-                    error: "Invalid params data",
-                    details: paramsValidation.error,
-                });
-            }
-            const cursoData = paramsValidation.data as GetCursoData;
-
-            const alunos = await this.matriculaUseCase.findAlunosByCurso(cursoData);
-
-            return reply.status(200).send({
-                message: "alunos found",
-                aluno: alunos,
-            });
-        } catch (error: any) {
+        if (!paramsValidation.success) {
             return reply.status(400).send({
-                error: error.message || "Failed to find alunos",
+                error: "Invalid params data",
+                details: paramsValidation.error,
             });
         }
+        const cursoData = paramsValidation.data as GetCursoData;
+
+        const alunos = await this.matriculaUseCase.findAlunosByCurso(cursoData);
+
+        return reply.status(200).send({
+            message: "alunos found",
+            aluno: alunos,
+        });
+    } catch (error: any) {
+        return reply.status(400).send({
+            error: error.message || "Failed to find alunos",
+        });
     }
+}
 }

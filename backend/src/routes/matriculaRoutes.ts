@@ -15,7 +15,7 @@ export async function matriculasRoutes(fastify: FastifyInstance) {
         );
 
         fastify.get("/matriculas/findAlunosByCurso/:id", matriculasController.getAlunosByCurso.bind(matriculasController));
-        fastify.get("/matriculas/findCursosByAluno/:id", matriculasController.getCursosByAluno.bind(matriculasController));
+        fastify.get("/matriculas/findCursosByAluno", matriculasController.getCursosByAluno.bind(matriculasController));
         
     });
 
