@@ -9,6 +9,9 @@ import "./styles/variables.css";
 import "./styles/layout.css";
 import "./styles/form.css";
 import "./styles/course.css";
+import "./styles/header.css";
+import "./styles/profile.css";
+
 import { AuthProvider } from "./contexts/AuthContext";
 
 

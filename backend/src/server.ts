@@ -14,7 +14,11 @@ const fastify = Fastify({
 })
 
 
-fastify.register(cors);
+fastify.register(cors, {
+  origin: ["http://localhost:5173"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+});
 fastify.register(loginRoute);
 fastify.register(userRoutes);
 fastify.register(cursosRoutes);

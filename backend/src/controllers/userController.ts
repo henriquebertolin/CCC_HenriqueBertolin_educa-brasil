@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { UserUseCase } from "../usecase/UserUseCase";
 import z from "zod";
 import jwt from 'jsonwebtoken'
-import { CreateUsuarioRequest, GetUserByIdRequest, GetUserByUsernameRequest } from "../entities/User";
+import { CreateUsuarioRequest, GetUserByIdRequest, GetUserByUsernameRequest, UpdateUsuarioRequest } from "../entities/User";
 
 export class UserController {
     private userUseCase: UserUseCase;
@@ -54,14 +54,41 @@ export class UserController {
 
     }
 
-    async updateUser(request : FastifyRequest, reply: FastifyReply) {
+    async updateUser(request: FastifyRequest, reply: FastifyReply) {
         const token = request.headers.authorization?.replace('Bearer ', '') as any;
         const decoded = jwt.decode(token) as any;
-        console.log("id: " + decoded.id);
-        try {
+        console.log("DECODED: " + decoded.username);
 
-        } catch (error : any) {
-            
+        try {
+            const updateUserBodySchema = z.object({
+                name: z.string().optional(),
+                username: z.string().optional(),
+                email: z.string().optional(),
+                senha: z.string().optional(),
+                cidade: z.string().optional()
+            });
+
+            const parse = updateUserBodySchema.safeParse(request.body);
+            if (!parse.success) {
+                return reply.status(400).send({
+                    error: "Invalid body data",
+                    details: parse.error,
+                });
+            }
+
+            const updateData = parse.data;
+            const userData: UpdateUsuarioRequest = {
+                id: decoded.id,
+                ...updateData
+            };
+
+            await this.userUseCase.updateUser(userData);
+
+
+        } catch (error: any) {
+            return reply.status(400).send({
+                error: error.message || 'Failed to update user',
+            });
         }
     }
 
@@ -70,10 +97,10 @@ export class UserController {
             const token = request.headers.authorization?.replace('Bearer ', '') as any;
             const decoded = jwt.decode(token) as any;
             console.log("DECODED: " + decoded.username);
-            const user = await this.userUseCase.findByUsername(({ username: decoded.username }));
+            const user = await this.userUseCase.findById(({ id: decoded.id }));
 
             return reply.status(200).send({
-                message : 'User found',
+                message: 'User found',
                 user
             })
         } catch (error: any) {
@@ -88,13 +115,13 @@ export class UserController {
             const id = request.params as GetUserByIdRequest;
             if (!id) {
                 return reply.status(404).send({
-                    error : 'Cannot be null'
+                    error: 'Cannot be null'
                 });
             }
             const user = await this.userUseCase.findById(id);
 
             return reply.status(200).send({
-                message : 'User found',
+                message: 'User found',
                 user
             })
         } catch (error: any) {

@@ -1,0 +1,12 @@
+.button.small {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s ease;
+}
+
+.button.small:hover {
+  opacity: 0.9;
+}

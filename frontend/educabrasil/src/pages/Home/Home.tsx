@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api } from "../../services/api";
+import { api, setAuthToken } from "../../services/api";
 import type { Course } from "../../types/course";
 import CourseSection from "./CourseSection";
+import Header from "../../components/Header";
 
 type User = { nome: string; professor: boolean };
 
 export default function Home() {
   const navigate = useNavigate();
-
   const cached = localStorage.getItem("user");
   const user: User | null = cached ? JSON.parse(cached) : null;
 
@@ -20,12 +20,28 @@ export default function Home() {
     return <div style={{ padding: 40 }}>Sessão inválida. Redirecionando...</div>;
   }
 
-  return user.professor ? <ProfessorView /> : <AlunoView />;
+  // 🔹 Função de logout global
+  function handleLogout() {
+    setAuthToken(null);
+    localStorage.removeItem("user");
+    navigate("/login");
+  }
+
+return (
+  <>
+    {/* Cabeçalho fixo da aplicação */}
+    <Header user={user} />
+
+    {/* Conteúdo principal da página */}
+    <div style={{ padding: "32px" }}>
+      {user.professor ? <ProfessorView /> : <AlunoView />}
+    </div>
+  </>
+);
+
 }
 
-/* =========================================================
-   VISÃO DO ALUNO
-========================================================= */
+/* -------- Visão do Aluno -------- */
 function AlunoView() {
   const [loading, setLoading] = useState(true);
   const [allCourses, setAllCourses] = useState<Course[]>([]);
@@ -40,60 +56,42 @@ function AlunoView() {
     async function fetchData() {
       try {
         setLoading(true);
-        setError(null);
-
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("Token não encontrado. Faça login novamente.");
-
         const [allRes, mineRes] = await Promise.all([
           api.get("/cursos/findAll"),
           api.get("/matriculas/findCursosByAluno"),
         ]);
-
         if (!mounted) return;
-
-        const allData: Course[] = allRes?.data?.data ?? [];
-        const mineData: Course[] = mineRes?.data?.aluno ?? [];
-
-        setAllCourses(allData);
-        setMyCourses(mineData);
+        setAllCourses(allRes?.data?.data ?? []);
+        setMyCourses(mineRes?.data?.aluno ?? []);
       } catch (err: any) {
         if (!mounted) return;
-
-        const msg =
-          err?.response?.data?.message ||
-          err?.message ||
-          "Falha ao carregar cursos.";
-        setError(msg);
+        setError(err?.response?.data?.message || "Erro ao carregar cursos.");
       } finally {
         if (mounted) setLoading(false);
       }
     }
 
     fetchData();
-
     return () => {
       mounted = false;
     };
   }, []);
-
-  function openCourse(c: Course) {
-    alert(`Abrir curso: ${c.title}`);
-  }
-
-  function enrollCourse(c: Course) {
-    alert(`Matricular no curso: ${c.title}`);
-  }
 
   if (loading) return <div style={{ padding: 40 }}>Carregando cursos...</div>;
   if (error) return <div style={{ padding: 40, color: "#b91c1c" }}>{error}</div>;
 
   const availableNotEnrolled = allCourses.filter((c) => !enrolledSet.has(c.id));
 
-  return (
-    <div style={{ padding: "32px" }}>
-      <h1 style={{ marginBottom: 16 }}>Meus cursos</h1>
+  function openCourse(c: Course) {
+    alert(`Abrir curso: ${c.title}`);
+  }
 
+  function enrollCourse(c: Course) {
+    alert(`Matricular-se em: ${c.title}`);
+  }
+
+  return (
+    <>
       <CourseSection
         title="Cursando / Matriculado"
         subtitle={`Total: ${myCourses.length}`}
@@ -111,18 +109,16 @@ function AlunoView() {
         onOpen={openCourse}
         onEnroll={enrollCourse}
       />
-    </div>
+    </>
   );
 }
 
-/* =========================================================
-   VISÃO DO PROFESSOR
-========================================================= */
+/* -------- Visão do Professor (placeholder) -------- */
 function ProfessorView() {
   return (
     <div style={{ padding: 40 }}>
-      <h1>Visão do Professor</h1>
-      <p>Gerencie seus cursos, crie aulas e acompanhe o progresso dos alunos.</p>
+      <h2>Visão do Professor</h2>
+      <p>Gerencie seus cursos e alunos.</p>
     </div>
   );
 }

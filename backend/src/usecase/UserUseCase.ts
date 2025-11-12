@@ -1,5 +1,5 @@
 import { db } from "../db";
-import { CreateUsuarioReponse, CreateUsuarioRequest, FindByIdResponse, GetUserByIdRequest, GetUserByUsernameRequest, LoginRequest, LoginResponse } from "../entities/User";
+import { CreateUsuarioReponse, CreateUsuarioRequest, FindByIdResponse, GetUserByIdRequest, GetUserByUsernameRequest, LoginRequest, LoginResponse, UpdateResponse, UpdateUsuarioRequest } from "../entities/User";
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
@@ -40,6 +40,37 @@ export class UserUseCase {
     return result.rows[0];
   }
 
-
-
+  async updateUser(userData : UpdateUsuarioRequest): Promise<UpdateResponse> {
+    const { id, name, username, email, senha, cidade } = userData;
+    const existingUser = await db.query(`select * from usuarios where id = $1`, [id]);
+    if (existingUser.rows.length < 1) {
+      throw new Error ('There is no user with this ID');
+    }
+    let hashPass;
+    if (senha) {
+      hashPass = await bcrypt.hash(senha, 10);
+    }
+    const currentDate = new Date();
+    console.log("CIDADE")
+    console.log(existingUser.rows[0].cidade)
+    const user = {
+      id,
+      name : name || existingUser.rows[0].name,
+      username : username || existingUser.rows[0].username,
+      email : email || existingUser.rows[0].email,
+      senha : hashPass || existingUser.rows[0].senha,
+      cidade : cidade || existingUser.rows[0].cidade
+    }
+    const result = await db.query(`UPDATE usuarios set 
+      nome = $2,
+      username = $3,
+      email = $4,
+      senha = $5,
+      cidade = $6
+      where id = $1`, [user.id, user.name, user.username, user.email, user.senha, user.cidade])
+      if (result.rowCount && result.rowCount < 1) {
+            throw new Error('Error on update');
+        }
+        return { success: true };
+  }
 }

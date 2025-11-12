@@ -17,6 +17,7 @@ export async function userRoutes(fastify: FastifyInstance) {
             "/user/loggedUser",
             userController.getLoggedUser.bind(userController)
         );
+        fastify.put("/user/update", userController.updateUser.bind(userController));
 
     });
 }

@@ -62,3 +62,15 @@ export interface FindByIdResponse {
     professor: boolean,
 }
 
+export interface UpdateUsuarioRequest {
+    id: string,
+    name?: string,
+    username?: string,
+    email?: string,
+    senha?: string,
+    cidade?: string,
+}
+
+export interface UpdateResponse {
+    success : true
+}
