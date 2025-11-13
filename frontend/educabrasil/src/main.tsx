@@ -11,6 +11,9 @@ import "./styles/form.css";
 import "./styles/course.css";
 import "./styles/header.css";
 import "./styles/profile.css";
+import "./styles/course-details.css";
+import "./styles/create-course.css";
+import "./styles/lessons.css";
 
 import { AuthProvider } from "./contexts/AuthContext";
 

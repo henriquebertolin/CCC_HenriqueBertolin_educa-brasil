@@ -77,3 +77,20 @@
   padding: 8px 10px;
   font-size: 14px;
 }
+
+.prof-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.prof-header h2 {
+  margin: 0;
+}
+
+.course-meta {
+  font-size: 14px;
+  color: #374151;
+  margin-top: 8px;
+}

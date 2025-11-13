@@ -58,7 +58,7 @@ export class MatriculaController {
             const token = request.headers.authorization?.replace('Bearer ', '') as any;
             const decoded = jwt.decode(token) as any;
             console.log("DECODED: " + decoded.username);
-            const user = await this.userUseCase.findByUsername(({ username: decoded.username }));
+            const user = await this.userUseCase.findById(({ id: decoded.id }));
             const aluno = await this.matriculaUseCase.findCursosByAluno(({id : user.id}));
 
             return reply.status(200).send({

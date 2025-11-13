@@ -26,14 +26,21 @@ create table matriculas (
 	curso_id uuid not null references curso(id)
 );
 
-create table aulas (
-  id uuid primary key default gen_random_uuid(),
-  curso_id uuid not null references curso(id),
-  titulo text not null,
-  video_url text not null,
-  duration_sec int not null default 0,
-  posicao int not null,
-  unique(curso_id, posicao)
+CREATE TABLE aulas (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id_curso UUID NOT NULL REFERENCES curso(id),
+  titulo TEXT NOT NULL,
+  descricao TEXT NOT NULL,
+  is_video boolean not null,
+  position INT NOT NULL,
+  is_published BOOLEAN NOT NULL DEFAULT FALSE,
+  estimated_sec INT DEFAULT 0,
+  video_url TEXT,
+  material_url TEXT,
+  material_text TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (id_curso, position)
 );
 
 CREATE OR REPLACE FUNCTION atualizar_data_modificacao()

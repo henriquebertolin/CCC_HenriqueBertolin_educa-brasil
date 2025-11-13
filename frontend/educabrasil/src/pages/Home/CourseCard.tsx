@@ -8,30 +8,40 @@ type Props = {
 };
 
 export default function CourseCard({ course, enrolled, onOpen, onEnroll }: Props) {
+  const isEnrolled = !!enrolled;
+
   return (
     <div className="course-card">
       <h3 className="course-title">{course.title}</h3>
       <p className="course-description">{course.description}</p>
+
       {course.nome_professor && (
         <div className="course-meta">Professor: {course.nome_professor}</div>
       )}
+
       <div className="course-actions">
-        {enrolled ? (
-          <>
-            <span className="badge">Matriculado</span>
-            <button className="button small" onClick={() => onOpen?.(course)}>
-              Entrar no curso
-            </button>
-          </>
+        {/* Botão principal: entra ou vê detalhes */}
+        <button
+          className="button small"
+          onClick={() => onOpen?.(course)}
+        >
+          {isEnrolled ? "Entrar no curso" : "Ver detalhes"}
+        </button>
+
+        {/* Botão de matrícula / matriculado */}
+        {isEnrolled ? (
+          <button className="button small enrolled" disabled>
+            Matriculado
+          </button>
         ) : (
-          <>
-            <button className="button small" onClick={() => onOpen?.(course)}>
-              Ver detalhes
-            </button>
-            <button className="button small secondary" onClick={() => onEnroll?.(course)}>
+          onEnroll && (
+            <button
+              className="button small secondary"
+              onClick={() => onEnroll(course)}
+            >
               Matricular-se
             </button>
-          </>
+          )
         )}
       </div>
     </div>

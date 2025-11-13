@@ -1,0 +1,23 @@
+.manage-lessons-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 24px;
+}
+
+.lesson-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 12px;
+}
+
+.lesson-badge.green {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.lesson-badge {
+  background: #e5e7eb;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}

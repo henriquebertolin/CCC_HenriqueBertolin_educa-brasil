@@ -5,14 +5,20 @@ type Props = {
   title: string;
   subtitle?: string;
   courses: Course[];
-  enrolledSet?: Set<string>; // ids matriculados para marcar na “todos”
+  enrolledSet?: Set<string>; // indica quais cursos já são do aluno
   emptyMessage: string;
   onOpen?: (c: Course) => void;
   onEnroll?: (c: Course) => void;
 };
 
 export default function CourseSection({
-  title, subtitle, courses, enrolledSet, emptyMessage, onOpen, onEnroll
+  title,
+  subtitle,
+  courses,
+  enrolledSet,
+  emptyMessage,
+  onOpen,
+  onEnroll
 }: Props) {
   return (
     <section className="courses-section">
@@ -25,15 +31,20 @@ export default function CourseSection({
         <p className="courses-subtitle">{emptyMessage}</p>
       ) : (
         <div className="course-grid">
-          {courses.map((c) => (
-            <CourseCard
-              key={c.id}
-              course={c}
-              enrolled={enrolledSet?.has(c.id)}
-              onOpen={onOpen}
-              onEnroll={onEnroll}
-            />
-          ))}
+          {courses.map((c) => {
+            const isEnrolled = enrolledSet?.has(c.id) ?? false;
+
+            return (
+              <CourseCard
+                key={c.id}
+                course={c}
+                enrolled={isEnrolled}
+                onOpen={onOpen}
+                // só envia onEnroll se NÃO estiver matriculado
+                onEnroll={!isEnrolled ? onEnroll : undefined}
+              />
+            );
+          })}
         </div>
       )}
     </section>

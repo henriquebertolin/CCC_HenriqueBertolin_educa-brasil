@@ -1,0 +1,257 @@
+import { useEffect, useState, useMemo } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { api } from "../../services/api";
+import Header from "../../components/Header";
+import type { Course } from "../../types/course";
+import type { Lesson } from "../../types/lesson";
+import type { User } from "../../types/user";
+
+type CourseResponse = {
+  message: string;
+  aulas: Course; // backend chama de "aulas", mas é o curso em si
+};
+
+type LessonsResponse = {
+  message: string;
+  aulas: Lesson[];
+};
+
+export default function CourseDetails() {
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+
+  if (!id) return <div>Curso inválido</div>;
+  const courseId = id; // agora o TS sabe que é string
+
+  const cachedUser = localStorage.getItem("user");
+  const user: User | null = cachedUser ? JSON.parse(cachedUser) : null;
+  const isProfessor = user?.professor === true;
+
+  const [course, setCourse] = useState<Course | null>(null);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [enrolling, setEnrolling] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const sortedLessons = useMemo(
+    () => [...lessons].sort((a, b) => a.position - b.position),
+    [lessons]
+  );
+
+  // cursos em que o aluno está matriculado (só faz sentido para aluno)
+  const [myCourses, setMyCourses] = useState<string[]>([]);
+
+  useEffect(() => {
+    async function loadMyCourses() {
+      if (isProfessor) return; // professor não precisa disso
+
+      try {
+        const { data } = await api.get("/matriculas/findCursosByAluno");
+        const ids = data.aluno.map((c: any) => c.id);
+        setMyCourses(ids);
+      } catch (err) {
+        console.error("Erro ao carregar matrículas", err);
+      }
+    }
+
+    loadMyCourses();
+  }, [isProfessor]);
+
+  const isEnrolled = !isProfessor && myCourses.includes(courseId);
+
+  // alunos matriculados (só para professor)
+  const [students, setStudents] = useState<User[]>([]);
+
+  useEffect(() => {
+    if (!isProfessor) return;
+
+    async function loadStudents() {
+      try {
+        const { data } = await api.get(`/matriculas/findAlunosByCurso/${courseId}`);
+        setStudents(data.aluno ?? []);
+      } catch (err) {
+        console.error("Erro ao carregar alunos do curso:", err);
+      }
+    }
+
+    loadStudents();
+  }, [courseId, isProfessor]);
+
+  // Dados do curso + aulas
+  useEffect(() => {
+    let mounted = true;
+
+    async function fetchData() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [courseRes, lessonsRes] = await Promise.all([
+          api.get<CourseResponse>(`/cursos/find/${courseId}`),
+          api.get<LessonsResponse>(`/aulas/getAulasFromCurso/${courseId}`),
+        ]);
+
+        if (!mounted) return;
+
+        setCourse(courseRes.data.aulas);
+        setLessons(lessonsRes.data.aulas ?? []);
+      } catch (err: any) {
+        if (!mounted) return;
+        setError(
+          err?.response?.data?.message || "Erro ao carregar detalhes do curso."
+        );
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
+    fetchData();
+    return () => {
+      mounted = false;
+    };
+  }, [courseId]);
+
+  async function handleEnroll() {
+    if (!user || !course) return;
+
+    setEnrolling(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      await api.post("/matriculas/create", {
+        alunoId: user.id,
+        cursoId: course.id,
+      });
+
+      setSuccess("Matrícula realizada com sucesso!");
+      // opcional: atualizar lista de cursos do aluno na hora
+      setMyCourses((prev) => [...prev, course.id]);
+    } catch (err: any) {
+      setError(
+        err?.response?.data?.message || "Erro ao realizar matrícula."
+      );
+    } finally {
+      setEnrolling(false);
+    }
+  }
+
+  if (!user) {
+    return <div style={{ padding: 40 }}>Sessão inválida. Faça login novamente.</div>;
+  }
+
+  if (loading) {
+    return (
+      <>
+        <Header user={user} />
+        <div style={{ padding: 40 }}>Carregando curso...</div>
+      </>
+    );
+  }
+
+  if (error || !course) {
+    return (
+      <>
+        <Header user={user} />
+        <div style={{ padding: 40, color: "#b91c1c" }}>
+          {error || "Curso não encontrado."}
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Header user={user} />
+
+      <div className="course-details-container">
+        <div className="course-details-header">
+          <button
+            className="back-link"
+            onClick={() => navigate("/home")}
+          >
+            ← Voltar para meus cursos
+          </button>
+
+          <h2 className="course-title-main">{course.title}</h2>
+          <p className="course-teacher">
+            Professor:{" "}
+            <strong>{course.nome_professor}</strong> ({course.email_professor})
+          </p>
+
+          <p className="course-description-main">{course.description}</p>
+
+          <div className="course-actions-main">
+            {/* 🔹 Botão de matrícula só aparece para ALUNO */}
+            {!isProfessor && (
+              isEnrolled ? (
+                <button className="button enrolled" disabled>
+                  Matriculado
+                </button>
+              ) : (
+                <button
+                  className="button"
+                  onClick={handleEnroll}
+                  disabled={enrolling}
+                >
+                  {enrolling ? "Matriculando..." : "Matricular-se neste curso"}
+                </button>
+              )
+            )}
+
+            {success && <span className="success-msg-inline">{success}</span>}
+            {error && <span className="error-msg-inline">{error}</span>}
+          </div>
+        </div>
+
+        <div className="course-lessons">
+          <h3>Conteúdo do curso</h3>
+
+          {sortedLessons.length === 0 ? (
+            <p className="muted">Ainda não há aulas cadastradas para este curso.</p>
+          ) : (
+            <ul className="lessons-list">
+              {sortedLessons.map((lesson) => (
+                <li key={lesson.id} className="lesson-item">
+                  <div className="lesson-header">
+                    <span className="lesson-position">#{lesson.position}</span>
+                    <span className="lesson-title">{lesson.titulo}</span>
+                    {lesson.is_video && (
+                      <span className="lesson-badge">Vídeo</span>
+                    )}
+                  </div>
+                  <p className="lesson-description">{lesson.descricao}</p>
+                  {lesson.estimated_sec > 0 && (
+                    <span className="lesson-time">
+                      ~ {Math.round(lesson.estimated_sec / 60)} min
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* 🔹 Lista de alunos matriculados – apenas para professor */}
+        {isProfessor && (
+          <div className="course-students">
+            <h3>Alunos matriculados</h3>
+
+            {students.length === 0 ? (
+              <p className="muted">Nenhum aluno matriculado ainda.</p>
+            ) : (
+              <ul className="students-list">
+                {students.map((s) => (
+                  <li key={s.id} className="student-item">
+                    <strong>{s.nome}</strong> — {s.email}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}

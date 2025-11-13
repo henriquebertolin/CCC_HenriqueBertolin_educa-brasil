@@ -14,7 +14,8 @@ export async function cursosRoutes(fastify: FastifyInstance) {
         );
 
         fastify.get("/cursos/findAll", cursosController.getCursos.bind(cursosController));
-
+        fastify.get("/cursos/find/:id", cursosController.findById.bind(cursosController));
+        fastify.get("/cursos/findByProf", cursosController.findCursosByProf.bind(cursosController));
     });
     
 }

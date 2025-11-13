@@ -72,5 +72,5 @@ export interface UpdateUsuarioRequest {
 }
 
 export interface UpdateResponse {
-    success : true
+    success : boolean
 }

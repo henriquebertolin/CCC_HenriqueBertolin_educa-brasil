@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
 import { CursosUseCase } from "../usecase/CursosUseCase"
 import jwt from 'jsonwebtoken'
-import { CreateCursoRequest } from "../entities/Curso";
+import { CreateCursoRequest, GetCursoData } from "../entities/Curso";
 
 
 export class CursosController {
@@ -52,7 +52,7 @@ export class CursosController {
 
     }
 
-        async getCursos(request: FastifyRequest, reply: FastifyReply) {
+    async getCursos(request: FastifyRequest, reply: FastifyReply) {
         try {
             const summary = await this.cursosUseCase.findCursos();
             return reply.status(200).send({
@@ -65,4 +65,46 @@ export class CursosController {
             });
         }
     }
+
+    async findById(request: FastifyRequest, reply: FastifyReply) {
+        try {
+            const getCursoIdParamsSchema = z.object({
+                id: z.string().min(1, "id is required"),
+            });
+            const paramsValidation = getCursoIdParamsSchema.safeParse(
+                request.params
+            );
+            if (!paramsValidation.success) {
+                return reply.status(400).send({
+                    error: "Invalid params data",
+                    details: paramsValidation.error,
+                });
+            }
+            const cursoData = paramsValidation.data as GetCursoData;
+            const aulas = await this.cursosUseCase.findById(cursoData);
+
+            return reply.status(200).send({
+                message: 'Curso found',
+                aulas
+            })
+        } catch (error: any) {
+            return reply.status(400).send({
+                error: error.message || 'Failed to retrieve curso'
+            });
+        }
+    }
+
+    async findCursosByProf(request: FastifyRequest, reply: FastifyReply) {
+        const token = request.headers.authorization?.replace('Bearer ', '') as any;
+        const decoded = jwt.decode(token) as any;
+        console.log("DECODED: " + decoded.username);
+        const curso = await this.cursosUseCase.findByProf(({ id: decoded.id }));
+        return reply.status(200).send({
+            message: 'Cursos found',
+            curso
+        })
+
+    }
+
+
 }
