@@ -14,6 +14,11 @@ import "./styles/profile.css";
 import "./styles/course-details.css";
 import "./styles/create-course.css";
 import "./styles/lessons.css";
+import "./styles/create-lesson.css";
+import "./styles/edit-lesson.css";
+import "./styles/watch-lesson.css";
+
+
 
 import { AuthProvider } from "./contexts/AuthContext";
 

@@ -1,5 +1,5 @@
 import { db } from "../db";
-import { Curso, GetCursoData } from "../entities/Curso";
+import { Curso, CursosUsuarios, GetCursoData } from "../entities/Curso";
 import { createMatriculaRequest, GetAlunoData, Matricula } from "../entities/Matricula";
 import { CreateUsuarioReponse, CreateUsuarioRequest, FindByIdResponse, GetUserByIdRequest, LoginRequest, LoginResponse, Usuario } from "../entities/User";
 import bcrypt from 'bcryptjs'
@@ -16,15 +16,42 @@ export class MatriculaUseCase {
 
     }
 
-    async findCursosByAluno(alunoData: GetAlunoData): Promise<Curso[]> {
-        const result = await db.query(`select curso.* from curso
-            inner join matriculas on matriculas.curso_id = curso.id
-            where matriculas.aluno_id  = $1`, [alunoData.id])
+    async findCursosByAluno(alunoData: GetAlunoData): Promise<CursosUsuarios[]> {
+        const result = await db.query(
+            `SELECT curso.* 
+       FROM curso
+       INNER JOIN matriculas ON matriculas.curso_id = curso.id
+      WHERE matriculas.aluno_id = $1`,
+            [alunoData.id]
+        );
 
-            return result.rows;
+        const cursos = result.rows as CursosUsuarios[];
+
+        // Calcula a porcentagem para cada curso
+        for (const curso of cursos) {
+            const { rows } = await db.query(
+                `
+      SELECT 
+        COALESCE(
+          (COUNT(*) FILTER (WHERE ua.finalizado = true) * 100.0 / NULLIF(COUNT(*), 0)),
+          0
+        ) AS porcentagem
+      FROM usuarios_aulas ua
+      INNER JOIN aulas a ON ua.id_aula = a.id
+      WHERE ua.id_aluno = $1
+        AND a.id_curso = $2
+      `,
+                [alunoData.id, curso.id]
+            );
+
+            curso.porcentagem = Number(rows[0]?.porcentagem ?? 0);
+        }
+
+        return cursos;
     }
 
-    async findAlunosByCurso(cursoData : GetCursoData) : Promise<Usuario[]> {
+
+    async findAlunosByCurso(cursoData: GetCursoData): Promise<Usuario[]> {
         const result = await db.query(`
             select usuarios.* from matriculas inner join usuarios
             on matriculas.aluno_id = usuarios.id 

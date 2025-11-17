@@ -3,7 +3,9 @@ export interface CreateAulasRequest {
     titulo : string,
     descricao: string,
     is_video: boolean,
-    posicao: number
+    posicao: number,
+    estimated_sec : number,
+    material_text : string,
 }
 
 export interface CreateAulasResponse {
@@ -22,4 +24,15 @@ export interface GetAulasFromCursoResponse {
     video_url : string,
     material_url : string,
     material_text : string,
+}
+
+export interface UpdateAulaVideoRequest {
+    id : string,
+    // estimated_sec : number,
+    // material_text : string,
+    material : {
+        filename : string,
+        mimetype: string,
+        buffer : Buffer
+    }
 }

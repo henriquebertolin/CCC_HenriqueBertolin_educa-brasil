@@ -39,9 +39,15 @@ CREATE TABLE aulas (
   material_url TEXT,
   material_text TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  UNIQUE (id_curso, position)
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+  create table usuarios_aulas(
+ 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	id_aluno UUID not null references usuarios(id),
+	id_aula UUID not null references aulas(id),
+	finalizado boolean not null default false
+  );
 
 CREATE OR REPLACE FUNCTION atualizar_data_modificacao()
 RETURNS TRIGGER AS $$

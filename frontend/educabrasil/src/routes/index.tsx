@@ -7,6 +7,11 @@ import ProtectedRoute from "../components/ProtectedRoutes";
 import CourseDetails from "../pages/Home/CourseDetails";
 import CreateCourse from "../pages/Home/CreateCourse";
 import ManageLessons from "../pages/Home/ManageLessons";
+import CreateLesson from "../pages/Home/CreateLesson";
+import EditLesson from "../pages/Home/EditLesson";
+import WatchLesson from "../pages/Home/WatchLesson";
+
+
 
 
 
@@ -62,6 +67,35 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/course/:courseId/lessons/:lessonId/edit"
+        element={
+          <ProtectedRoute>
+            <EditLesson />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/course/:courseId/lessons/:lessonId/watch"
+        element={
+          <ProtectedRoute>
+            <WatchLesson />
+          </ProtectedRoute>
+        }
+      />
+
+
+      <Route
+        path="/course/:id/lessons/new"
+        element={
+          <ProtectedRoute>
+            <CreateLesson />
+          </ProtectedRoute>
+        }
+      />
+
 
 
 

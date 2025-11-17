@@ -1,0 +1,37 @@
+.create-lesson-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 24px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+}
+
+.create-lesson-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.create-lesson-form input,
+.create-lesson-form textarea,
+.create-lesson-form select {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
+.success-msg {
+  background: #d1fae5;
+  padding: 10px;
+  border-radius: 6px;
+  color: #065f46;
+}
+
+.error-msg {
+  background: #fee2e2;
+  padding: 10px;
+  border-radius: 6px;
+  color: #991b1b;
+}

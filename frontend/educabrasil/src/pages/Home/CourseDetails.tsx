@@ -162,96 +162,103 @@ export default function CourseDetails() {
   }
 
   return (
-    <>
-      <Header user={user} />
+  <>
+    <Header user={user} />
 
-      <div className="course-details-container">
-        <div className="course-details-header">
-          <button
-            className="back-link"
-            onClick={() => navigate("/home")}
-          >
-            ← Voltar para meus cursos
-          </button>
+    <div className="course-details-container">
+      <div className="course-details-header">
+        <button
+          className="back-link"
+          onClick={() => navigate("/home")}
+        >
+          ← Voltar para meus cursos
+        </button>
 
-          <h2 className="course-title-main">{course.title}</h2>
-          <p className="course-teacher">
-            Professor:{" "}
-            <strong>{course.nome_professor}</strong> ({course.email_professor})
-          </p>
+        <h2 className="course-title-main">{course.title}</h2>
+        <p className="course-teacher">
+          Professor:{" "}
+          <strong>{course.nome_professor}</strong> ({course.email_professor})
+        </p>
 
-          <p className="course-description-main">{course.description}</p>
+        <p className="course-description-main">{course.description}</p>
 
-          <div className="course-actions-main">
-            {/* 🔹 Botão de matrícula só aparece para ALUNO */}
-            {!isProfessor && (
-              isEnrolled ? (
-                <button className="button enrolled" disabled>
-                  Matriculado
-                </button>
-              ) : (
-                <button
-                  className="button"
-                  onClick={handleEnroll}
-                  disabled={enrolling}
-                >
-                  {enrolling ? "Matriculando..." : "Matricular-se neste curso"}
-                </button>
-              )
-            )}
+        <div className="course-actions-main">
+          {/* 🔹 Botão de matrícula só aparece para ALUNO */}
+          {!isProfessor && (
+            isEnrolled ? (
+              <button className="button enrolled" disabled>
+                Matriculado
+              </button>
+            ) : (
+              <button
+                className="button"
+                onClick={handleEnroll}
+                disabled={enrolling}
+              >
+                {enrolling ? "Matriculando..." : "Matricular-se neste curso"}
+              </button>
+            )
+          )}
 
-            {success && <span className="success-msg-inline">{success}</span>}
-            {error && <span className="error-msg-inline">{error}</span>}
-          </div>
+          {success && <span className="success-msg-inline">{success}</span>}
+          {error && <span className="error-msg-inline">{error}</span>}
         </div>
+      </div>
 
-        <div className="course-lessons">
-          <h3>Conteúdo do curso</h3>
+      <div className="course-lessons">
+        <h3>Conteúdo do curso</h3>
 
-          {sortedLessons.length === 0 ? (
-            <p className="muted">Ainda não há aulas cadastradas para este curso.</p>
-          ) : (
-            <ul className="lessons-list">
-              {sortedLessons.map((lesson) => (
-                <li key={lesson.id} className="lesson-item">
-                  <div className="lesson-header">
-                    <span className="lesson-position">#{lesson.position}</span>
-                    <span className="lesson-title">{lesson.titulo}</span>
-                    {lesson.is_video && (
-                      <span className="lesson-badge">Vídeo</span>
-                    )}
-                  </div>
-                  <p className="lesson-description">{lesson.descricao}</p>
-                  {lesson.estimated_sec > 0 && (
-                    <span className="lesson-time">
-                      ~ {Math.round(lesson.estimated_sec / 60)} min
-                    </span>
+        {sortedLessons.length === 0 ? (
+          <p className="muted">Ainda não há aulas cadastradas para este curso.</p>
+        ) : (
+          <ul className="lessons-list">
+            {sortedLessons.map((lesson) => (
+              <li
+                key={lesson.id}
+                className="lesson-item"
+                onClick={() =>
+                  navigate(`/course/${courseId}/lessons/${lesson.id}/watch`)
+                }
+                style={{ cursor: "pointer" }}
+              >
+                <div className="lesson-header">
+                  <span className="lesson-position">#{lesson.position}</span>
+                  <span className="lesson-title">{lesson.titulo}</span>
+                  {lesson.is_video && (
+                    <span className="lesson-badge">Vídeo</span>
                   )}
+                </div>
+                <p className="lesson-description">{lesson.descricao}</p>
+                {lesson.estimated_sec > 0 && (
+                  <span className="lesson-time">
+                    ~ {Math.round(lesson.estimated_sec / 60)} min
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* 🔹 Lista de alunos matriculados – apenas para professor */}
+      {isProfessor && (
+        <div className="course-students">
+          <h3>Alunos matriculados</h3>
+
+          {students.length === 0 ? (
+            <p className="muted">Nenhum aluno matriculado ainda.</p>
+          ) : (
+            <ul className="students-list">
+              {students.map((s) => (
+                <li key={s.id} className="student-item">
+                  <strong>{s.nome}</strong> — {s.email}
                 </li>
               ))}
             </ul>
           )}
         </div>
-
-        {/* 🔹 Lista de alunos matriculados – apenas para professor */}
-        {isProfessor && (
-          <div className="course-students">
-            <h3>Alunos matriculados</h3>
-
-            {students.length === 0 ? (
-              <p className="muted">Nenhum aluno matriculado ainda.</p>
-            ) : (
-              <ul className="students-list">
-                {students.map((s) => (
-                  <li key={s.id} className="student-item">
-                    <strong>{s.nome}</strong> — {s.email}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
-      </div>
-    </>
-  );
+      )}
+    </div>
+  </>
+);
 }

@@ -1,0 +1,13 @@
+.watch-lesson-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 24px;
+}
+
+.lesson-text-material {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 16px;
+  border-radius: 10px;
+  margin-top: 20px;
+}

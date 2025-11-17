@@ -23,3 +23,15 @@ export interface CreateCursoResponse {
 export interface GetCursoData {
     id: string
 }
+
+export interface CursosUsuarios {
+    id : string,
+    title : string,
+    description : string,
+    teacher_id : string,
+    teacher_nome : string,
+    teacher_email : string,
+    isPublished : boolean,
+    createdAt : Date,
+    porcentagem : number
+}
