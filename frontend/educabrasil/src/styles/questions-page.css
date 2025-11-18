@@ -1,0 +1,28 @@
+.questions-container {
+  padding: 24px;
+}
+
+.questions-list {
+  margin-top: 16px;
+  list-style: none;
+  padding: 0;
+}
+
+.question-item {
+  padding: 14px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.question-item:hover {
+  background: #f3f4f6;
+}
+
+.question-text {
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.question-author {
+  font-size: 12px;
+  color: #6b7280;
+}

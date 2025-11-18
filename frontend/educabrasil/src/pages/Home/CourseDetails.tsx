@@ -43,9 +43,9 @@ export default function CourseDetails() {
   );
 
   const allLessonsDone =
-  !isProfessor &&
-  sortedLessons.length > 0 &&
-  sortedLessons.every((l) => l.finalizado);
+    !isProfessor &&
+    sortedLessons.length > 0 &&
+    sortedLessons.every((l) => l.finalizado);
 
 
   // cursos em que o aluno está matriculado (só faz sentido para aluno)
@@ -171,236 +171,246 @@ export default function CourseDetails() {
   }
 
   async function handleFinishLesson(lessonId: string) {
-  if (!user) return;
+    if (!user) return;
 
-  try {
-    setUpdatingLessonId(lessonId);
+    try {
+      setUpdatingLessonId(lessonId);
 
-    await api.put(`/aulas/updateFinalizado/${user.id}/${lessonId}`);
+      await api.put(`/aulas/updateFinalizado/${user.id}/${lessonId}`);
 
-    // Atualiza só essa aula localmente para finalizado = true
-    setLessons((prev) =>
-      prev.map((l) =>
-        l.id === lessonId ? { ...l, finalizado: true } : l
-      )
-    );
-  } catch (err) {
-    console.error("Erro ao marcar aula como finalizada", err);
-    // se você quiser, pode setar uma mensagem de erro aqui
-  } finally {
-    setUpdatingLessonId(null);
+      // Atualiza só essa aula localmente para finalizado = true
+      setLessons((prev) =>
+        prev.map((l) =>
+          l.id === lessonId ? { ...l, finalizado: true } : l
+        )
+      );
+    } catch (err) {
+      console.error("Erro ao marcar aula como finalizada", err);
+      // se você quiser, pode setar uma mensagem de erro aqui
+    } finally {
+      setUpdatingLessonId(null);
+    }
   }
-}
 
-function handleGenerateCertificate() {
-  if (!user || !course) return;
+  function handleGenerateCertificate() {
+    if (!user || !course) return;
 
-  // A5 horizontal
-  const doc = new jsPDF({
-    orientation: "landscape",
-    unit: "pt",
-    format: "a5"
-  });
+    // A5 horizontal
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "pt",
+      format: "a5"
+    });
 
-  const width = doc.internal.pageSize.getWidth();
-  const height = doc.internal.pageSize.getHeight();
+    const width = doc.internal.pageSize.getWidth();
+    const height = doc.internal.pageSize.getHeight();
 
-  // 🎨 Fundo azul claro
-  doc.setFillColor("#e3f2fd"); // azul bem claro
-  doc.rect(0, 0, width, height, "F");
+    // 🎨 Fundo azul claro
+    doc.setFillColor("#e3f2fd"); // azul bem claro
+    doc.rect(0, 0, width, height, "F");
 
-  // 🎨 Faixa azul escura no topo
-  doc.setFillColor("#0d47a1");
-  doc.rect(0, 0, width, 60, "F");
+    // 🎨 Faixa azul escura no topo
+    doc.setFillColor("#0d47a1");
+    doc.rect(0, 0, width, 60, "F");
 
-  // 🌟 Título branco centralizado
-  doc.setFontSize(22);
-  doc.setTextColor("#ffffff");
-  doc.setFont("helvetica", "bold");
-  doc.text("CERTIFICADO DE CONCLUSÃO", width / 2, 38, { align: "center" });
+    // 🌟 Título branco centralizado
+    doc.setFontSize(22);
+    doc.setTextColor("#ffffff");
+    doc.setFont("helvetica", "bold");
+    doc.text("CERTIFICADO DE CONCLUSÃO", width / 2, 38, { align: "center" });
 
-  // 🧩 Container branco
-  doc.setFillColor("#ffffff");
-  doc.roundedRect(30, 80, width - 60, height - 140, 8, 8, "F");
+    // 🧩 Container branco
+    doc.setFillColor("#ffffff");
+    doc.roundedRect(30, 80, width - 60, height - 140, 8, 8, "F");
 
-  let y = 120;
+    let y = 120;
 
-  // Texto preto
-  doc.setTextColor("#000000");
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(12);
+    // Texto preto
+    doc.setTextColor("#000000");
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
 
-  doc.text("A plataforma EducaBrasil certifica que:", width / 2, y, { align: "center" });
-  y += 30;
+    doc.text("A plataforma EducaBrasil certifica que:", width / 2, y, { align: "center" });
+    y += 30;
 
-  // Nome do aluno em destaque
-  doc.setFontSize(18);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor("#0d47a1");
-  doc.text(user.nome, width / 2, y, { align: "center" });
-  y += 30;
+    // Nome do aluno em destaque
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor("#0d47a1");
+    doc.text(user.nome, width / 2, y, { align: "center" });
+    y += 30;
 
-  // Curso
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor("#000");
-  doc.text("concluiu o curso:", width / 2, y, { align: "center" });
-  y += 25;
+    // Curso
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor("#000");
+    doc.text("concluiu o curso:", width / 2, y, { align: "center" });
+    y += 25;
 
-  doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text(`"${course.title}"`, width / 2, y, { align: "center" });
-  y += 30;
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text(`"${course.title}"`, width / 2, y, { align: "center" });
+    y += 30;
 
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "normal");
-  doc.text(
-    `ministrado pelo professor ${course.nome_professor}.`,
-    width / 2,
-    y,
-    { align: "center" }
-  );
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.text(
+      `ministrado pelo professor ${course.nome_professor}.`,
+      width / 2,
+      y,
+      { align: "center" }
+    );
 
-  // Rodapé
-  const today = new Date().toLocaleDateString("pt-BR");
-  doc.setFontSize(10);
-  doc.text(`Data: ${today}`, width - 50, height - 30, { align: "right" });
+    // Rodapé
+    const today = new Date().toLocaleDateString("pt-BR");
+    doc.setFontSize(10);
+    doc.text(`Data: ${today}`, width - 50, height - 30, { align: "right" });
 
-  // Salvar PDF
-  doc.save(`certificado-${course.title}.pdf`);
-}
-
+    // Salvar PDF
+    doc.save(`certificado-${course.title}.pdf`);
+  }
 
 
 
-return (
-  <>
-    <Header user={user} />
 
-    <div className="course-details-container">
-      <div className="course-details-header">
-        <button
-          className="back-link"
-          onClick={() => navigate("/home")}
-        >
-          ← Voltar para meus cursos
-        </button>
+  return (
+    <>
+      <Header user={user} />
 
-        <h2 className="course-title-main">{course.title}</h2>
-        <p className="course-teacher">
-          Professor:{" "}
-          <strong>{course.nome_professor}</strong> ({course.email_professor})
-        </p>
-
-        <p className="course-description-main">{course.description}</p>
-
-        <div className="course-actions-main">
-          {/* 🔹 Botão de matrícula só aparece para ALUNO */}
-          {!isProfessor && (
-            isEnrolled ? (
-              <button className="button enrolled" disabled>
-                Matriculado
-              </button>
-            ) : (
-              <button
-                className="button"
-                onClick={handleEnroll}
-                disabled={enrolling}
-              >
-                {enrolling ? "Matriculando..." : "Matricular-se neste curso"}
-              </button>
-            )
-          )}
-
-          {success && <span className="success-msg-inline">{success}</span>}
-          {error && <span className="error-msg-inline">{error}</span>}
-        </div>
-      </div>
-
-      <div className="course-lessons">
-        <h3>Conteúdo do curso</h3>
-
-        {sortedLessons.length === 0 ? (
-          <p className="muted">Ainda não há aulas cadastradas para este curso.</p>
-        ) : (
-          <ul className="lessons-list">
-            {sortedLessons.map((lesson) => (
-              <li
-                key={lesson.id}
-                className="lesson-item"
-                style={{ cursor: "pointer" }}
-                onClick={() =>
-                  navigate(`/course/${courseId}/lessons/${lesson.id}/watch`)
-                }
-              >
-                <div className="lesson-header">
-                  <span className="lesson-position">#{lesson.position}</span>
-                  <span className="lesson-title">{lesson.titulo}</span>
-                  {lesson.is_video && (
-                    <span className="lesson-badge">Vídeo</span>
-                  )}
-
-                  {/* 🔥 Botão de marcar concluída (somente ALUNO) */}
-                  {!isProfessor && (
-                    lesson.finalizado ? (
-                      <span className="lesson-done">✔ Concluída</span>
-                    ) : (
-                      <button
-                        className="lesson-finish-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleFinishLesson(lesson.id);
-                        }}
-                        disabled={updatingLessonId === lesson.id}
-                      >
-                        {updatingLessonId === lesson.id
-                          ? "Marcando..."
-                          : "Marcar como concluída"}
-                      </button>
-                    )
-                  )}
-                </div>
-
-                <p className="lesson-description">{lesson.descricao}</p>
-                {lesson.estimated_sec > 0 && (
-                  <span className="lesson-time">
-                    ~ {Math.round(lesson.estimated_sec / 60)} min
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      {/* 🔹 Botão de certificado – só para aluno, e só se 100% concluído */}
-      {allLessonsDone && !isProfessor && (
-        <div style={{ marginTop: 24 }}>
-          <button className="button" onClick={handleGenerateCertificate}>
-            Gerar certificado
+      <div className="course-details-container">
+        <div className="course-details-header">
+          <button
+            className="back-link"
+            onClick={() => navigate("/home")}
+          >
+            ← Voltar para meus cursos
           </button>
+
+          <h2 className="course-title-main">{course.title}</h2>
+          <p className="course-teacher">
+            Professor:{" "}
+            <strong>{course.nome_professor}</strong> ({course.email_professor})
+          </p>
+
+          <p className="course-description-main">{course.description}</p>
+
+          <div className="course-actions-main">
+            {/* 🔹 Botão de matrícula só aparece para ALUNO */}
+            {!isProfessor && (
+              isEnrolled ? (
+                <button className="button enrolled" disabled>
+                  Matriculado
+                </button>
+              ) : (
+                <button
+                  className="button"
+                  onClick={handleEnroll}
+                  disabled={enrolling}
+                >
+                  {enrolling ? "Matriculando..." : "Matricular-se neste curso"}
+                </button>
+              )
+            )}
+
+            {success && <span className="success-msg-inline">{success}</span>}
+            {error && <span className="error-msg-inline">{error}</span>}
+          </div>
+          <div style={{ marginTop: 16 }}>
+            <button
+              className="button secondary"
+              onClick={() => navigate(`/course/${courseId}/questions`)}
+            >
+              Dúvidas do curso
+            </button>
+          </div>
+
+
         </div>
-      )}
 
-      {/* 🔹 Lista de alunos matriculados – apenas para professor */}
-      {isProfessor && (
-        <div className="course-students">
-          <h3>Alunos matriculados</h3>
+        <div className="course-lessons">
+          <h3>Conteúdo do curso</h3>
 
-          {students.length === 0 ? (
-            <p className="muted">Nenhum aluno matriculado ainda.</p>
+          {sortedLessons.length === 0 ? (
+            <p className="muted">Ainda não há aulas cadastradas para este curso.</p>
           ) : (
-            <ul className="students-list">
-              {students.map((s) => (
-                <li key={s.id} className="student-item">
-                  <strong>{s.nome}</strong> — {s.email}
+            <ul className="lessons-list">
+              {sortedLessons.map((lesson) => (
+                <li
+                  key={lesson.id}
+                  className="lesson-item"
+                  style={{ cursor: "pointer" }}
+                  onClick={() =>
+                    navigate(`/course/${courseId}/lessons/${lesson.id}/watch`)
+                  }
+                >
+                  <div className="lesson-header">
+                    <span className="lesson-position">#{lesson.position}</span>
+                    <span className="lesson-title">{lesson.titulo}</span>
+                    {lesson.is_video && (
+                      <span className="lesson-badge">Vídeo</span>
+                    )}
+
+                    {/* 🔥 Botão de marcar concluída (somente ALUNO) */}
+                    {!isProfessor && (
+                      lesson.finalizado ? (
+                        <span className="lesson-done">✔ Concluída</span>
+                      ) : (
+                        <button
+                          className="lesson-finish-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleFinishLesson(lesson.id);
+                          }}
+                          disabled={updatingLessonId === lesson.id}
+                        >
+                          {updatingLessonId === lesson.id
+                            ? "Marcando..."
+                            : "Marcar como concluída"}
+                        </button>
+                      )
+                    )}
+                  </div>
+
+                  <p className="lesson-description">{lesson.descricao}</p>
+                  {lesson.estimated_sec > 0 && (
+                    <span className="lesson-time">
+                      ~ {Math.round(lesson.estimated_sec / 60)} min
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
           )}
         </div>
-      )}
-    </div>
-  </>
-);
+
+        {/* 🔹 Botão de certificado – só para aluno, e só se 100% concluído */}
+        {allLessonsDone && !isProfessor && (
+          <div style={{ marginTop: 24 }}>
+            <button className="button" onClick={handleGenerateCertificate}>
+              Gerar certificado
+            </button>
+          </div>
+        )}
+
+        {/* 🔹 Lista de alunos matriculados – apenas para professor */}
+        {isProfessor && (
+          <div className="course-students">
+            <h3>Alunos matriculados</h3>
+
+            {students.length === 0 ? (
+              <p className="muted">Nenhum aluno matriculado ainda.</p>
+            ) : (
+              <ul className="students-list">
+                {students.map((s) => (
+                  <li key={s.id} className="student-item">
+                    <strong>{s.nome}</strong> — {s.email}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+      </div>
+    </>
+  );
 }

@@ -17,4 +17,9 @@ export class PerguntasUseCase {
         const query = await db.query(`select p.*, u.nome from perguntas p inner join usuarios u on p.id_usuario = u.id where p.id_curso = $1`, [cursoData.id]);
         return query.rows;
     }
+
+    async findPerguntaById(perguntaData : CreatePerguntasResponse) {
+        const query = await db.query(`select p.*, u.nome from perguntas p inner join usuarios u on p.id_usuario = u.id where p.id = $1 `, [perguntaData.id]);
+        return query.rows;
+    }
 }

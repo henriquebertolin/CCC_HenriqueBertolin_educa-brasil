@@ -10,7 +10,9 @@ import ManageLessons from "../pages/Home/ManageLessons";
 import CreateLesson from "../pages/Home/CreateLesson";
 import EditLesson from "../pages/Home/EditLesson";
 import WatchLesson from "../pages/Home/WatchLesson";
-
+import QuestionsPage from "../pages/Home/QuestionsPage";
+import QuestionDetails from "../pages/Home/QuestionDetails";
+import NewQuestion from "../pages/Home/NewQuestion";
 
 
 
@@ -82,6 +84,33 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <WatchLesson />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/course/:courseId/questions"
+        element={
+          <ProtectedRoute>
+            <QuestionsPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/course/:courseId/questions/:questionId"
+        element={
+          <ProtectedRoute>
+            <QuestionDetails />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/course/:courseId/questions/new"
+        element={
+          <ProtectedRoute>
+            <NewQuestion />
           </ProtectedRoute>
         }
       />

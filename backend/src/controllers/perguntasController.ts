@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
 import jwt from 'jsonwebtoken'
-import { CreatePerguntasRequest } from "../entities/Perguntas";
+import { CreatePerguntasRequest, CreatePerguntasResponse } from "../entities/Perguntas";
 import { PerguntasUseCase } from "../usecase/PerguntasUseCase";
 import { GetCursoData } from "../entities/Curso";
 
@@ -71,6 +71,35 @@ export class PerguntasController {
         } catch (error: any) {
             return reply.status(400).send({
                 error: error.message || 'Failed to find perguntas'
+            })
+        }
+    }
+
+    async findById(request: FastifyRequest, reply: FastifyReply) {
+        try {
+            const getPerguntaParamsSchema = z.object({
+                id: z.string().min(1, "id is required"),
+            });
+            const paramsValidation = getPerguntaParamsSchema.safeParse(
+                request.params
+            );
+
+            if (!paramsValidation.success) {
+                return reply.status(400).send({
+                    error: "Invalid params data",
+                    details: paramsValidation.error,
+                });
+            }
+            const perguntaData = paramsValidation.data as CreatePerguntasResponse;
+            const pergunta = await this.perguntasUseCase.findPerguntaById(perguntaData);
+
+            return reply.status(200).send({
+                message: 'Pergunta found',
+                pergunta
+            })
+        } catch (error: any) {
+            return reply.status(400).send({
+                error: error.message || 'Failed to find pergunta'
             })
         }
     }

@@ -14,6 +14,7 @@ export async function perguntasRoutes(fastify: FastifyInstance) {
         );
 
         fastify.get("/perguntas/findByCurso/:id", perguntasController.findByCurso.bind(perguntasController));
+        fastify.get("/perguntas/findById/:id", perguntasController.findById.bind(perguntasController));
 
     });
     

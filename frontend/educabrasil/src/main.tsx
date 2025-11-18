@@ -17,7 +17,8 @@ import "./styles/lessons.css";
 import "./styles/create-lesson.css";
 import "./styles/edit-lesson.css";
 import "./styles/watch-lesson.css";
-
+import "./styles/questions-page.css";
+import "./styles/question-details.css"
 
 
 import { AuthProvider } from "./contexts/AuthContext";
