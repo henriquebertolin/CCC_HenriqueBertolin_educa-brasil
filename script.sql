@@ -49,6 +49,20 @@ CREATE TABLE aulas (
 	finalizado boolean not null default false
   );
 
+  create table perguntas (
+ 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	texto text not null,
+	id_usuario UUID not null references usuarios(id),
+	id_curso UUID not null references curso(id)
+  );
+
+  create table respostas(
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	texto text not null,
+	id_usuario UUID not null references usuarios(id),
+	id_pergunta UUID not null references perguntas(id)
+  );
+
 CREATE OR REPLACE FUNCTION atualizar_data_modificacao()
 RETURNS TRIGGER AS $$
 BEGIN

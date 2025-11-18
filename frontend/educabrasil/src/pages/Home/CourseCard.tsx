@@ -15,33 +15,43 @@ export default function CourseCard({ course, enrolled, onOpen, onEnroll }: Props
       <h3 className="course-title">{course.title}</h3>
       <p className="course-description">{course.description}</p>
 
-      {course.nome_professor && (
-        <div className="course-meta">Professor: {course.nome_professor}</div>
+      {/* 🔥 Barra de progresso – só para cursos matriculados */}
+      {isEnrolled && typeof course.porcentagem === "number" && (
+        <div className="progress-wrapper">
+          <div className="progress-bar">
+            <div
+              className="progress-fill"
+              style={{ width: `${course.porcentagem}%` }}
+            />
+          </div>
+          <span className="progress-text">
+            {course.porcentagem}% concluído
+          </span>
+        </div>
       )}
 
       <div className="course-actions">
-        {/* Botão principal: entra ou vê detalhes */}
-        <button
-          className="button small"
-          onClick={() => onOpen?.(course)}
-        >
-          {isEnrolled ? "Entrar no curso" : "Ver detalhes"}
-        </button>
-
-        {/* Botão de matrícula / matriculado */}
         {isEnrolled ? (
-          <button className="button small enrolled" disabled>
-            Matriculado
-          </button>
-        ) : (
-          onEnroll && (
-            <button
-              className="button small secondary"
-              onClick={() => onEnroll(course)}
-            >
-              Matricular-se
+          <>
+            <span className="badge">Matriculado</span>
+            <button className="button small" onClick={() => onOpen?.(course)}>
+              Entrar no curso
             </button>
-          )
+          </>
+        ) : (
+          <>
+            <button className="button small" onClick={() => onOpen?.(course)}>
+              Ver detalhes
+            </button>
+            {onEnroll && (
+              <button
+                className="button small secondary"
+                onClick={() => onEnroll(course)}
+              >
+                Matricular-se
+              </button>
+            )}
+          </>
         )}
       </div>
     </div>

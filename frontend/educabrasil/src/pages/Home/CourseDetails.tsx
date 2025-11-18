@@ -5,6 +5,8 @@ import Header from "../../components/Header";
 import type { Course } from "../../types/course";
 import type { Lesson } from "../../types/lesson";
 import type { User } from "../../types/user";
+import jsPDF from "jspdf";
+
 
 type CourseResponse = {
   message: string;
@@ -31,6 +33,7 @@ export default function CourseDetails() {
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
+  const [updatingLessonId, setUpdatingLessonId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -38,6 +41,12 @@ export default function CourseDetails() {
     () => [...lessons].sort((a, b) => a.position - b.position),
     [lessons]
   );
+
+  const allLessonsDone =
+  !isProfessor &&
+  sortedLessons.length > 0 &&
+  sortedLessons.every((l) => l.finalizado);
+
 
   // cursos em que o aluno está matriculado (só faz sentido para aluno)
   const [myCourses, setMyCourses] = useState<string[]>([]);
@@ -161,7 +170,110 @@ export default function CourseDetails() {
     );
   }
 
-  return (
+  async function handleFinishLesson(lessonId: string) {
+  if (!user) return;
+
+  try {
+    setUpdatingLessonId(lessonId);
+
+    await api.put(`/aulas/updateFinalizado/${user.id}/${lessonId}`);
+
+    // Atualiza só essa aula localmente para finalizado = true
+    setLessons((prev) =>
+      prev.map((l) =>
+        l.id === lessonId ? { ...l, finalizado: true } : l
+      )
+    );
+  } catch (err) {
+    console.error("Erro ao marcar aula como finalizada", err);
+    // se você quiser, pode setar uma mensagem de erro aqui
+  } finally {
+    setUpdatingLessonId(null);
+  }
+}
+
+function handleGenerateCertificate() {
+  if (!user || !course) return;
+
+  // A5 horizontal
+  const doc = new jsPDF({
+    orientation: "landscape",
+    unit: "pt",
+    format: "a5"
+  });
+
+  const width = doc.internal.pageSize.getWidth();
+  const height = doc.internal.pageSize.getHeight();
+
+  // 🎨 Fundo azul claro
+  doc.setFillColor("#e3f2fd"); // azul bem claro
+  doc.rect(0, 0, width, height, "F");
+
+  // 🎨 Faixa azul escura no topo
+  doc.setFillColor("#0d47a1");
+  doc.rect(0, 0, width, 60, "F");
+
+  // 🌟 Título branco centralizado
+  doc.setFontSize(22);
+  doc.setTextColor("#ffffff");
+  doc.setFont("helvetica", "bold");
+  doc.text("CERTIFICADO DE CONCLUSÃO", width / 2, 38, { align: "center" });
+
+  // 🧩 Container branco
+  doc.setFillColor("#ffffff");
+  doc.roundedRect(30, 80, width - 60, height - 140, 8, 8, "F");
+
+  let y = 120;
+
+  // Texto preto
+  doc.setTextColor("#000000");
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(12);
+
+  doc.text("A plataforma EducaBrasil certifica que:", width / 2, y, { align: "center" });
+  y += 30;
+
+  // Nome do aluno em destaque
+  doc.setFontSize(18);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor("#0d47a1");
+  doc.text(user.nome, width / 2, y, { align: "center" });
+  y += 30;
+
+  // Curso
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor("#000");
+  doc.text("concluiu o curso:", width / 2, y, { align: "center" });
+  y += 25;
+
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text(`"${course.title}"`, width / 2, y, { align: "center" });
+  y += 30;
+
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "normal");
+  doc.text(
+    `ministrado pelo professor ${course.nome_professor}.`,
+    width / 2,
+    y,
+    { align: "center" }
+  );
+
+  // Rodapé
+  const today = new Date().toLocaleDateString("pt-BR");
+  doc.setFontSize(10);
+  doc.text(`Data: ${today}`, width - 50, height - 30, { align: "right" });
+
+  // Salvar PDF
+  doc.save(`certificado-${course.title}.pdf`);
+}
+
+
+
+
+return (
   <>
     <Header user={user} />
 
@@ -216,10 +328,10 @@ export default function CourseDetails() {
               <li
                 key={lesson.id}
                 className="lesson-item"
+                style={{ cursor: "pointer" }}
                 onClick={() =>
                   navigate(`/course/${courseId}/lessons/${lesson.id}/watch`)
                 }
-                style={{ cursor: "pointer" }}
               >
                 <div className="lesson-header">
                   <span className="lesson-position">#{lesson.position}</span>
@@ -227,7 +339,28 @@ export default function CourseDetails() {
                   {lesson.is_video && (
                     <span className="lesson-badge">Vídeo</span>
                   )}
+
+                  {/* 🔥 Botão de marcar concluída (somente ALUNO) */}
+                  {!isProfessor && (
+                    lesson.finalizado ? (
+                      <span className="lesson-done">✔ Concluída</span>
+                    ) : (
+                      <button
+                        className="lesson-finish-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFinishLesson(lesson.id);
+                        }}
+                        disabled={updatingLessonId === lesson.id}
+                      >
+                        {updatingLessonId === lesson.id
+                          ? "Marcando..."
+                          : "Marcar como concluída"}
+                      </button>
+                    )
+                  )}
                 </div>
+
                 <p className="lesson-description">{lesson.descricao}</p>
                 {lesson.estimated_sec > 0 && (
                   <span className="lesson-time">
@@ -239,6 +372,15 @@ export default function CourseDetails() {
           </ul>
         )}
       </div>
+
+      {/* 🔹 Botão de certificado – só para aluno, e só se 100% concluído */}
+      {allLessonsDone && !isProfessor && (
+        <div style={{ marginTop: 24 }}>
+          <button className="button" onClick={handleGenerateCertificate}>
+            Gerar certificado
+          </button>
+        </div>
+      )}
 
       {/* 🔹 Lista de alunos matriculados – apenas para professor */}
       {isProfessor && (

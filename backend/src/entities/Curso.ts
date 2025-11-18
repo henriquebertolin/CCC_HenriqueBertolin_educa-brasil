@@ -24,6 +24,11 @@ export interface GetCursoData {
     id: string
 }
 
+export interface GetAulasCursoData {
+    id: string,
+    id_aluno : string
+}
+
 export interface CursosUsuarios {
     id : string,
     title : string,

@@ -5,7 +5,7 @@ type Props = {
   title: string;
   subtitle?: string;
   courses: Course[];
-  enrolledSet?: Set<string>; // indica quais cursos já são do aluno
+  enrolledSet?: Set<string>;
   emptyMessage: string;
   onOpen?: (c: Course) => void;
   onEnroll?: (c: Course) => void;
@@ -40,7 +40,7 @@ export default function CourseSection({
                 course={c}
                 enrolled={isEnrolled}
                 onOpen={onOpen}
-                // só envia onEnroll se NÃO estiver matriculado
+                // só permite "Matricular-se" se ainda NÃO estiver matriculado
                 onEnroll={!isEnrolled ? onEnroll : undefined}
               />
             );

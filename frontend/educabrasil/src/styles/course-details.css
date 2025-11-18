@@ -148,3 +148,36 @@
   border-radius: 8px;
   font-size: 14px;
 }
+
+.lesson-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lesson-title {
+  font-weight: 500;
+}
+
+.lesson-finish-btn {
+  margin-left: auto;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  border: none;
+  background: #10b981;
+  color: #fff;
+  cursor: pointer;
+}
+
+.lesson-finish-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.lesson-done {
+  margin-left: auto;
+  font-size: 13px;
+  color: #059669;
+  font-weight: 600;
+}

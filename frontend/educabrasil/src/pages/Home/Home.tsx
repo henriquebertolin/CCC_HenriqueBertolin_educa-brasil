@@ -94,9 +94,11 @@ function AlunoView() {
         title="Cursando / Matriculado"
         subtitle={`Total: ${myCourses.length}`}
         courses={myCourses}
+        enrolledSet={enrolledSet}
         emptyMessage="Você ainda não está matriculado em nenhum curso."
         onOpen={openCourse}
       />
+
 
       <CourseSection
         title="Todos os cursos disponíveis"

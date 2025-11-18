@@ -2,7 +2,7 @@ import { db } from "../db";
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { CreateAulasRequest, CreateAulasResponse, GetAulasFromCursoResponse, UpdateAulaVideoRequest } from "../entities/Aulas";
-import { GetCursoData } from "../entities/Curso";
+import { GetAulasCursoData, GetCursoData } from "../entities/Curso";
 import { GetObjectCommand, PutObjectCommand, PutObjectCommandInput, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
@@ -39,11 +39,21 @@ export class AulasUseCase {
         return create.rows[0];
     }
 
-    async getAulasFromCurso(id: GetCursoData): Promise<GetAulasFromCursoResponse[]> {
-        const aulasFromCurso = await db.query(`select id, id_curso, titulo, descricao, 
+    async getAulasFromCurso(id: GetAulasCursoData): Promise<GetAulasFromCursoResponse[]> {
+        const usuario = await db.query(`select * from usuarios where id = $1`, [id.id_aluno]);
+        if (usuario.rows[0].professor) {
+            const aulasFromCurso = await db.query(`select id, id_curso, titulo, descricao, 
             is_video, position, is_published, estimated_sec, video_url, material_url, material_text from aulas
             where id_curso = $1`, [id.id]);
-        return aulasFromCurso.rows;
+            return aulasFromCurso.rows;
+        } else {
+            const aulasFromCurso = await db.query(`select a.id, ua.finalizado, a.id_curso, a.titulo, a.descricao, a.is_video, a.position, 
+            a.is_published, a.estimated_sec, a.video_url, a.material_url, a.material_text 
+            from aulas a inner join usuarios_aulas ua on a.id = ua.id_aula
+            where id_curso = $1 
+            and id_aluno = $2`, [id.id, id.id_aluno]);
+            return aulasFromCurso.rows;
+        }
     }
 
     async uploadMaterial(materialData: UpdateAulaVideoRequest): Promise<UpdateAulaVideoRequest> {
@@ -112,7 +122,7 @@ export class AulasUseCase {
             if (findCheck.rows.length < 1) {
                 throw new Error('Aula não encontrada');
             }
-            const updateCheck = await db.query(`update usuarios_aulas set finalizado = true where id = $1`, [findCheck.rows[0].id]); 
+            const updateCheck = await db.query(`update usuarios_aulas set finalizado = true where id = $1`, [findCheck.rows[0].id]);
         } catch (error: any) {
             throw new Error('Error accessing class');
         }

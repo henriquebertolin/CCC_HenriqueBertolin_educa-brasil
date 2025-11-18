@@ -3,7 +3,7 @@ import z from "zod";
 import jwt from 'jsonwebtoken'
 import { AulasUseCase } from "../usecase/AulasUseCase";
 import { CreateAulasRequest, CreateAulasResponse, UpdateAulaVideoRequest } from "../entities/Aulas";
-import { GetCursoData } from "../entities/Curso";
+import { GetAulasCursoData, GetCursoData } from "../entities/Curso";
 import { MultipartFile } from '@fastify/multipart';
 
 
@@ -86,6 +86,8 @@ export class AulasController {
 
     async getAulasFromCurso(request: FastifyRequest, reply: FastifyReply) {
         try {
+            const token = request.headers.authorization?.replace('Bearer ', '') as any;
+            const decoded = jwt.decode(token) as any;
             const getCursoIdParamsSchema = z.object({
                 id: z.string().min(1, "id is required"),
             });
@@ -98,7 +100,11 @@ export class AulasController {
                     details: paramsValidation.error,
                 });
             }
-            const cursoData = paramsValidation.data as GetCursoData;
+            let cursoData = paramsValidation.data as GetAulasCursoData;
+            cursoData = {
+                ...cursoData,
+                id_aluno : decoded.id
+            }
             const aulas = await this.aulasUseCase.getAulasFromCurso(cursoData);
 
             return reply.status(200).send({

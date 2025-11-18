@@ -10,4 +10,5 @@ export type Lesson = {
   video_url: string | null;
   material_url: string | null;
   material_text: string | null;
+    finalizado?: boolean; 
 };

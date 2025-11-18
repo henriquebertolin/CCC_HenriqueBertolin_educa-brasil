@@ -7,4 +7,5 @@ export type Course = {
   created_at?: string;
   nome_professor?: string;
   email_professor?: string;
+  porcentagem?: number;
 };
