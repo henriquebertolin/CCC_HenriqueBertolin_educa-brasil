@@ -7,6 +7,7 @@ import { cursosRoutes } from './routes/cursosRoutes'
 import { matriculasRoutes } from './routes/matriculaRoutes'
 import { aulasRoutes } from './routes/aulasRoutes'
 import { perguntasRoutes } from './routes/perguntasRoutes'
+import { respostasRoutes } from './routes/respostasRoutes'
 
 dotenv.config()
 
@@ -27,6 +28,7 @@ fastify.register(cursosRoutes);
 fastify.register(matriculasRoutes);
 fastify.register(aulasRoutes);
 fastify.register(perguntasRoutes);
+fastify.register(respostasRoutes);
 
 // validar conexão com o banco
 
