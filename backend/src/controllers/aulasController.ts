@@ -235,7 +235,47 @@ export class AulasController {
         } catch (error: any) {
             console.error("Erro ao gerar URL do comprovante:", error);
             return reply.status(400).send({
-                error: error.message || "Failed accessing the payment proof.",
+                error: error.message || "Failed accessing the material.",
+                success: false,
+            });
+        }
+    }
+
+    async updateFinalizado(request: FastifyRequest, reply: FastifyReply) {
+        try {
+            const { aluno, aulaId } = request.params as {
+                aluno: string;
+                aulaId: string;
+            };
+            console.log(aluno);
+            console.log(aulaId);
+
+            if (!aluno || !aulaId) {
+                return reply.status(400).send({
+                    error: "Missing information",
+                    success: false,
+                });
+            }
+
+            const paramSchema = z.string().uuid("ID must be a valid UUID");
+
+            if (
+                !paramSchema.safeParse(aluno).success ||
+                !paramSchema.safeParse(aulaId).success
+            ) {
+                return reply.status(400).send({
+                    error: "Invalid ID",
+                    success: false,
+                });
+            }
+
+            const update = this.aulasUseCase.updateFinalizado(aluno, aulaId);
+
+
+        } catch (error: any) {
+            console.error("Erro ao atualizar:", error);
+            return reply.status(400).send({
+                error: error.message || "Failed update.",
                 success: false,
             });
         }

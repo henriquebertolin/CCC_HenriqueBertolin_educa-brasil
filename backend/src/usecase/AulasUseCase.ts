@@ -106,6 +106,18 @@ export class AulasUseCase {
         return query.rows[0];
     }
 
+    async updateFinalizado(alunoId: string, aulaId: string) {
+        try {
+            const findCheck = await db.query(`select * from usuarios_aulas where id_aluno = $1 and id_aula = $2`, [alunoId, aulaId]);
+            if (findCheck.rows.length < 1) {
+                throw new Error('Aula não encontrada');
+            }
+            const updateCheck = await db.query(`update usuarios_aulas set finalizado = true where id = $1`, [findCheck.rows[0].id]); 
+        } catch (error: any) {
+            throw new Error('Error accessing class');
+        }
+    }
+
     async getMaterialUrl(aulaId: string): Promise<string> {
         try {
             const aula = await db.query(`select * from aulas where id = $1`, [aulaId]);
