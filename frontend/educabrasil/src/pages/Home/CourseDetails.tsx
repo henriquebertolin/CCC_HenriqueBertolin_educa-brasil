@@ -89,6 +89,12 @@ export default function CourseDetails() {
 
   // Dados do curso + aulas
   useEffect(() => {
+    if (!courseId) {
+      setError("Curso não encontrado.");
+      setLoading(false);
+      return;
+    }
+
     let mounted = true;
 
     async function fetchData() {
@@ -96,15 +102,23 @@ export default function CourseDetails() {
         setLoading(true);
         setError(null);
 
-        const [courseRes, lessonsRes] = await Promise.all([
-          api.get<CourseResponse>(`/cursos/find/${courseId}`),
-          api.get<LessonsResponse>(`/aulas/getAulasFromCurso/${courseId}`),
-        ]);
+        // 1️⃣ carrega o curso
+        const courseRes = await api.get<CourseResponse>(`/cursos/find/${courseId}`);
+        const courseData = courseRes.data.aulas;
 
         if (!mounted) return;
+        setCourse(courseData);
 
-        setCourse(courseRes.data.aulas);
+        // 2️⃣ escolhe endpoint conforme matriculado
+        const endpoint = isEnrolled
+          ? `/aulas/getAulasFromCurso/${courseId}`
+          : `/aulas/notMatriculado/${courseId}`;
+
+        const lessonsRes = await api.get<LessonsResponse>(endpoint);
+
+        if (!mounted) return;
         setLessons(lessonsRes.data.aulas ?? []);
+
       } catch (err: any) {
         if (!mounted) return;
         setError(
@@ -119,7 +133,8 @@ export default function CourseDetails() {
     return () => {
       mounted = false;
     };
-  }, [courseId]);
+  }, [courseId, isEnrolled]);
+
 
   async function handleEnroll() {
     if (!user || !course) return;
@@ -338,20 +353,23 @@ export default function CourseDetails() {
                 <li
                   key={lesson.id}
                   className="lesson-item"
-                  style={{ cursor: "pointer" }}
-                  onClick={() =>
-                    navigate(`/course/${courseId}/lessons/${lesson.id}/watch`)
-                  }
+                  onClick={() => {
+                    if (!isEnrolled && !isProfessor) return;
+                    navigate(`/course/${courseId}/lessons/${lesson.id}/watch`);
+                  }}
+                  style={{ cursor: (isEnrolled || isProfessor) ? "pointer" : "not-allowed" }}
                 >
-                  <div className="lesson-header">
-                    <span className="lesson-position">#{lesson.position}</span>
-                    <span className="lesson-title">{lesson.titulo}</span>
-                    {lesson.is_video && (
-                      <span className="lesson-badge">Vídeo</span>
-                    )}
 
-                    {/* 🔥 Botão de marcar concluída (somente ALUNO) */}
-                    {!isProfessor && (
+                  <div className="lesson-header">
+
+                    <div className="lesson-header-left">
+                      <span className="lesson-position">#{lesson.position}</span>
+                      <span className="lesson-title">{lesson.titulo}</span>
+                      {lesson.is_video && <span className="lesson-badge">Vídeo</span>}
+                    </div>
+
+                    {/* Botão ou badge — somente aluno matriculado */}
+                    {!isProfessor && isEnrolled && (
                       lesson.finalizado ? (
                         <span className="lesson-done">✔ Concluída</span>
                       ) : (
@@ -370,6 +388,7 @@ export default function CourseDetails() {
                       )
                     )}
                   </div>
+
 
                   <p className="lesson-description">{lesson.descricao}</p>
                   {lesson.estimated_sec > 0 && (

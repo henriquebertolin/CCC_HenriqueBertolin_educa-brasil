@@ -1,4 +1,5 @@
 import { db } from "../db";
+import { Aula, CreateAulasRequest } from "../entities/Aulas";
 import { Curso, CursosUsuarios, GetCursoData } from "../entities/Curso";
 import { createMatriculaRequest, GetAlunoData, Matricula } from "../entities/Matricula";
 import { CreateUsuarioReponse, CreateUsuarioRequest, FindByIdResponse, GetUserByIdRequest, LoginRequest, LoginResponse, Usuario } from "../entities/User";
@@ -12,6 +13,13 @@ export class MatriculaUseCase {
             throw new Error("Aluno já matriculado nesse curso");
         }
         const create = await db.query(`insert into matriculas (aluno_id, curso_id) values ($1, $2)`, [matriculaData.alunoId, matriculaData.cursoId]);
+        const aulasQ = await db.query(`select * from aulas where id_curso = $1`, [matriculaData.cursoId]);
+        const aulas = aulasQ.rows as Aula[];
+        for (const aula of aulas) {
+            const { rows } = await db.query(
+                `insert into usuarios_aulas (id_aluno, id_aula, finalizado) values ($1, $2, false)`, [matriculaData.alunoId, aula.id]
+            )
+        }
         return create.rows[0];
 
     }
@@ -31,15 +39,18 @@ export class MatriculaUseCase {
         for (const curso of cursos) {
             const { rows } = await db.query(
                 `
-      SELECT 
-        COALESCE(
-          (COUNT(*) FILTER (WHERE ua.finalizado = true) * 100.0 / NULLIF(COUNT(*), 0)),
-          0
-        ) AS porcentagem
-      FROM usuarios_aulas ua
-      INNER JOIN aulas a ON ua.id_aula = a.id
-      WHERE ua.id_aluno = $1
-        AND a.id_curso = $2
+                SELECT 
+                TRUNC(
+                    COALESCE(
+                    (COUNT(*) FILTER (WHERE ua.finalizado = true) * 100.0 / NULLIF(COUNT(*), 0)),
+                    0
+                    ), 
+                    2
+                ) AS porcentagem
+                FROM usuarios_aulas ua
+                INNER JOIN aulas a ON ua.id_aula = a.id
+                WHERE ua.id_aluno = $1
+                AND a.id_curso = $2
       `,
                 [alunoData.id, curso.id]
             );

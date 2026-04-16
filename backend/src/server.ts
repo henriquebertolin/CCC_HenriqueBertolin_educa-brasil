@@ -18,7 +18,7 @@ const fastify = Fastify({
 
 
 fastify.register(cors, {
-  origin: ["http://localhost:5173"],
+  origin: ["http://localhost:5173", "http://100.96.1.2:5173"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 });
@@ -34,12 +34,17 @@ fastify.register(respostasRoutes);
 
 const PORT = Number(process.env.PORT) || 3000;
 
-const start = async() => { fastify.listen({port: PORT})
-.then(() => fastify.log.info(`Servidor rodando na porta ${PORT}`))
-.catch(err => {
+const start = async () => {
+  try {
+    await fastify.listen({
+      port: PORT,
+      host: '100.96.1.2'
+    });
+
+    fastify.log.info(`Servidor rodando na porta ${PORT}`);
+  } catch (err) {
     fastify.log.error(err);
     process.exit(1);
-})
-}
-
+  }
+};
 start();

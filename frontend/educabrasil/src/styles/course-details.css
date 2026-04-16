@@ -181,3 +181,88 @@
   color: #059669;
   font-weight: 600;
 }
+
+/* Contêiner de cada aula */
+.lesson-item {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  transition: background 0.2s;
+}
+
+.lesson-item:hover {
+  background: #f9fafb;
+}
+
+/* Cabeçalho da aula (título, badge, botão no canto direito) */
+.lesson-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;  /* 🔥 garante alinhamento igual */
+  gap: 12px;
+}
+
+/* Agrupamento do lado esquerdo */
+.lesson-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Número da aula */
+.lesson-position {
+  font-weight: bold;
+  color: #2563eb;
+}
+
+/* Título */
+.lesson-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Badge de vídeo */
+.lesson-badge {
+  background: #2563eb;
+  color: white;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* Descrição */
+.lesson-description {
+  margin-top: 6px;
+  color: #4b5563;
+}
+
+/* Tempo estimado */
+.lesson-time {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Botão de finalizar */
+.lesson-finish-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.lesson-finish-btn:hover {
+  background: #1e40af;
+}
+
+/* Badge de concluída */
+.lesson-done {
+  color: #16a34a;
+  font-weight: bold;
+  font-size: 14px;
+}

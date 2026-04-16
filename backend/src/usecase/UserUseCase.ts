@@ -55,12 +55,14 @@ export class UserUseCase {
     console.log(existingUser.rows[0].cidade)
     const user = {
       id,
-      name : name || existingUser.rows[0].name,
+      name : name || existingUser.rows[0].nome,
       username : username || existingUser.rows[0].username,
       email : email || existingUser.rows[0].email,
       senha : hashPass || existingUser.rows[0].senha,
       cidade : cidade || existingUser.rows[0].cidade
     }
+    console.log(user.name);
+    console.log(user.cidade);
     const result = await db.query(`UPDATE usuarios set 
       nome = $2,
       username = $3,

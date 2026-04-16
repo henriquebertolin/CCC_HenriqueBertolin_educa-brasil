@@ -5,6 +5,8 @@ import { CreateAulasRequest, CreateAulasResponse, GetAulasFromCursoResponse, Upd
 import { GetAulasCursoData, GetCursoData } from "../entities/Curso";
 import { GetObjectCommand, PutObjectCommand, PutObjectCommandInput, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { Usuario } from "../entities/User";
+import { Matricula, MatriculaTeste } from "../entities/Matricula";
 
 export class AulasUseCase {
 
@@ -27,11 +29,14 @@ export class AulasUseCase {
     async createAula(aulaData: CreateAulasRequest): Promise<CreateAulasResponse> {
         const create = await db.query(`insert into aulas (id_curso, titulo, descricao, is_video, position, estimated_sec, material_text) values ($1, $2, $3, $4, $5, $6, $7) returning id`,
             [aulaData.id_curso, aulaData.titulo, aulaData.descricao, aulaData.is_video, aulaData.posicao, aulaData.estimated_sec, aulaData.material_text]);
-        const alunosMatriculados = await db.query(`select * from matriculas where id_curso = $1`, [aulaData.id_curso]);
-        for (const aluno of alunosMatriculados.rows) {
+        const alunosMatriculadosQ = await db.query(`select * from matriculas where curso_id = $1`, [aulaData.id_curso]);
+        const alunosMatriculados = alunosMatriculadosQ.rows as MatriculaTeste[];
+        for (const aluno of alunosMatriculados) {
+            console.log(alunosMatriculados);
+            console.log(aluno.aluno_id);
             await db.query(
                 `INSERT INTO usuarios_aulas (id_aluno, id_aula, finalizado) VALUES ($1, $2, false)`,
-                [aluno.id_aluno, create.rows[0].id]
+                [aluno.aluno_id, create.rows[0].id]
             );
         }
 
@@ -54,6 +59,12 @@ export class AulasUseCase {
             and id_aluno = $2`, [id.id, id.id_aluno]);
             return aulasFromCurso.rows;
         }
+    }
+
+    async getAulasNotMatricula(id : GetCursoData): Promise<GetAulasFromCursoResponse[]> {
+        const query = await db.query(`select a.id, a.id_curso, a.titulo, a.descricao, a.is_video, a.position, 
+            a.is_published, a.estimated_sec, a.video_url, a.material_url, a.material_text from aulas a where id_curso = $1`, [id.id]);
+        return query.rows;
     }
 
     async uploadMaterial(materialData: UpdateAulaVideoRequest): Promise<UpdateAulaVideoRequest> {

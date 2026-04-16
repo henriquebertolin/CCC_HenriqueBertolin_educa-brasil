@@ -84,6 +84,33 @@ export class AulasController {
         }
     }
 
+    async getAulasFromCursoNotMatriculado(request: FastifyRequest, reply: FastifyReply) {
+        try {
+            const getCursoIdParamsSchema = z.object({
+                id: z.string().min(1, "id is required"),
+            });
+            const paramsValidation = getCursoIdParamsSchema.safeParse(
+                request.params
+            );
+            if (!paramsValidation.success) {
+                return reply.status(400).send({
+                    error: "Invalid params data",
+                    details: paramsValidation.error,
+                });
+            }
+            let cursoData = paramsValidation.data as GetCursoData;
+            const aulas = await this.aulasUseCase.getAulasNotMatricula(cursoData);
+            return reply.status(200).send({
+                message: 'Aulas found',
+                aulas
+            })
+        } catch (error: any) {
+            return reply.status(400).send({
+                error: error.message || "Failed to find aulas",
+            });
+        }
+    }
+
     async getAulasFromCurso(request: FastifyRequest, reply: FastifyReply) {
         try {
             const token = request.headers.authorization?.replace('Bearer ', '') as any;
@@ -103,7 +130,7 @@ export class AulasController {
             let cursoData = paramsValidation.data as GetAulasCursoData;
             cursoData = {
                 ...cursoData,
-                id_aluno : decoded.id
+                id_aluno: decoded.id
             }
             const aulas = await this.aulasUseCase.getAulasFromCurso(cursoData);
 

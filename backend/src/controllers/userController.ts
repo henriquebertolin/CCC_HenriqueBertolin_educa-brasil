@@ -15,43 +15,46 @@ export class UserController {
         try {
             const createUserSchema = z.object({
                 name: z.string().min(1, "Nome é obrigatório"),
-                username: z.string().min(1, "Usernamr é obrigatório"),
-                email: z.email().min(1, "Email é obrigatório"),
-                senha: z.string().min(1, "Senha é obrigatória"),
-                professor: z.boolean("Boolean é obrigatório"),
+                username: z.string().min(1, "Username é obrigatório"),
+                email: z.string().email("Email inválido"),
+                senha: z.string()
+                    .min(6, "Senha deve ter no mínimo 6 caracteres")
+                    .regex(/[A-Z]/, "Deve conter pelo menos 1 letra maiúscula")
+                    .regex(/[a-z]/, "Deve conter pelo menos 1 letra minúscula")
+                    .regex(/[0-9]/, "Deve conter pelo menos 1 número")
+                    .regex(/[^A-Za-z0-9]/, "Deve conter pelo menos 1 caractere especial"),
+                professor: z.boolean({
+                    error: "Professor deve ser true ou false"
+                }),
                 cidade: z.string().min(1, "Cidade é obrigatória")
-            })
+            });
 
             const validationResult = createUserSchema.safeParse(request.body);
 
             if (!validationResult.success) {
                 return reply.status(400).send({
-                    error: "Invalid data",
-                    details: validationResult.error
+                    message: validationResult.error.issues[0]?.message || "Dados inválidos",
+                    errors: validationResult.error.issues.map(issue => ({
+                        field: issue.path.join("."),
+                        message: issue.message
+                    }))
                 });
             }
 
-            const createData = validationResult.data as CreateUsuarioRequest;
-
-            if (!createData) {
-                return reply.code(400).send({
-                    error: 'Cannot be null'
-                })
-            }
+            const createData: CreateUsuarioRequest = validationResult.data;
 
             const user = await this.userUseCase.createUser(createData);
 
             return reply.status(201).send({
-                message: 'User created sucessfully',
+                message: "User created successfully",
                 user
-            })
+            });
 
         } catch (error: any) {
-            return reply.status(400).send({
-                error: error.message || 'Failed to create user'
-            })
+            return reply.status(500).send({
+                message: error.message || "Failed to create user"
+            });
         }
-
     }
 
     async updateUser(request: FastifyRequest, reply: FastifyReply) {

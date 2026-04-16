@@ -25,5 +25,6 @@ export async function aulasRoutes(fastify: FastifyInstance) {
         fastify.get("/aulas/find/:id", aulasController.find.bind(aulasController));
         fastify.get("/aulas/getSignedUrl/:id", aulasController.getMaterialUrl.bind(aulasController));
         fastify.put("/aulas/updateFinalizado/:aluno/:aulaId", aulasController.updateFinalizado.bind(aulasController));
+        fastify.get("/aulas/notMatriculado/:id", aulasController.getAulasFromCursoNotMatriculado.bind(aulasController));
     })
 }

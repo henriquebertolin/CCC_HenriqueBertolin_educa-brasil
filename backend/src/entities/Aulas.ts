@@ -8,6 +8,22 @@ export interface CreateAulasRequest {
     material_text : string,
 }
 
+export interface Aula {
+    id : string,
+    id_curso : string,
+    titulo : string,
+    descricao : string,
+    is_video : boolean,
+    position : number,
+    is_published : number,
+    estimated_sec : number,
+    video_url : string,
+    material_url : string,
+    material_text : string,
+    created_at : Date,
+    updated_at : Date
+}
+
 export interface CreateAulasResponse {
     id : string
 }
